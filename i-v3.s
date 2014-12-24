@@ -274,7 +274,6 @@ L0F64:  lda     Z_HDR_START_PC
         sta     Z_PC+1
         lda     Z_HDR_START_PC+1
         sta     Z_PC
-        inc     Z_STORY_SIDE
         lda     Z_HDR_FLAGS2+1
         ora     INTERP_FLAGS
         sta     Z_HDR_FLAGS2+1
@@ -2607,8 +2606,6 @@ L1	jsr     NUMBER_TO_DIGIT
         bpl     L1
         jsr     CLRCHN
         jsr     Z_NEW_LINE
-        lda     #$00
-        sta     Z_STORY_SIDE
         ldx     #<INT_ERROR_TEXT
         lda     #>INT_ERROR_TEXT
         ldy     #$12
@@ -2787,7 +2784,6 @@ L2151:  lda     INPUT_BUFFER,x
         bpl     L2151
         lda     #$00
         sta     $60
-        sta     Z_STORY_SIDE
         sta     COLOR
         lda     #$13		; set cursor to home (0,0)
         jsr     CHROUT
@@ -2909,9 +2905,7 @@ L223F:  lda     Z_LOCAL_VARIABLES + $20,x
         ldy     $63
         clc
         jsr     PLOT	; restore original position
-        ldx     #$FF
-        stx     Z_STORY_SIDE
-        inx
+        ldx     #$00
         stx     $22
         inx
         stx     COLOR
@@ -3282,8 +3276,6 @@ L258F:  rti
 DO_CARRIAGE_RETURN
 .(
 	jsr     Z_NEW_LINE
-        ldx     #$00
-        stx     Z_STORY_SIDE
         rts
 .)
 
