@@ -2,12 +2,11 @@
 
 ; uses code from http://www.cbmhardware.de/georam/index.php
 
-REU_CMD_STASH           = %11111100
-REU_CMD_FETCH           = %11111101
-GEOBUF_RAM =	$DE00
-GEOBUF_PAGE =	$DFFE
-GEOBUF_BANK =	$DFFF		; each bank is 16k, *not* 64k!
-TEST_DATA =	$1000
+REU_CMD_STASH = 	%11111100
+REU_CMD_FETCH =		%11111101
+GEOBUF_RAM =		$DE00
+GEOBUF_PAGE =		$DFFE
+GEOBUF_BANK =		$DFFF	; each bank is 16k, *not* 64k!
 
 				;  512k = $00-$1f
 				; 1024k = $00-$3f
@@ -24,23 +23,23 @@ REU_BANKS
 
 GEORAM_DETECT
 .(
-	ldx #00
-	lda #00
-	sta GEOBUF_BANK
-	sta GEOBUF_PAGE		; Georam $0000
-	ldx #$b5
+	ldx	#0
+	lda	#0
+	sta	GEOBUF_BANK
+	sta	GEOBUF_PAGE	; GeoRAM $0000
+	ldx	#$b5
 	txa
-p2	sta	GEOBUF_RAM,x	; write 190 bytes to GeoRAM
+L1	sta	GEOBUF_RAM,x	; write 190 bytes to GeoRAM
 	lda	GEOBUF_RAM,x	; read,
 	cmp	GEOBUF_RAM,x	; and compare ...
-	bne	y0		; no good, we can't write
+	bne	L2		; no good, we can't write
 	inx
 	cpx	#190       
-	bne	p2 
+	bne	L1 
 	lda	REU_PRESENT
 	ora	#$02		; All good, GeoRAM is there
 	sta	REU_PRESENT
-y0	rts
+L2	rts
 .)
 
 REU_DETECT:
@@ -266,7 +265,6 @@ L1:     jsr     CHRIN
 	rts
 .)
 
-
 IREU_STASH:
 .(
         lda     REU_PRESENT
@@ -275,7 +273,9 @@ IREU_STASH:
         beq     CBM_REU_STASH
         cmp     #2
         beq     GEORAM_STASH
-L9a     jmp     L9a
+DIE	jmp     DIE
+.)
+
 GEORAM_STASH
 .(
         lda     Z_VECTOR2+1
@@ -291,6 +291,7 @@ L1      lda     SECTOR_BUFFER,y
         bne     L1
         rts
 .)
+
 CBM_REU_STASH
 .(
         lda     Z_VECTOR2+1
@@ -312,5 +313,4 @@ CBM_REU_STASH
         lda     #REU_CMD_STASH          ; % 1111 1100
         sta     REU_COMMAND             ; from RAM to REU
 	rts
-.)
 .)
