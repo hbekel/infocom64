@@ -4,6 +4,7 @@
 
 REU_CMD_STASH = 	%11111100
 REU_CMD_FETCH =		%11111101
+SCRATCH_RAM =		$C000
 GEOBUF_RAM =		$DE00
 GEOBUF_PAGE =		$DFFE
 GEOBUF_BANK =		$DFFF	; each bank is 16k, *not* 64k!
@@ -27,19 +28,29 @@ GEORAM_DETECT
 	lda	#0
 	sta	GEOBUF_BANK
 	sta	GEOBUF_PAGE	; GeoRAM $0000
-	ldx	#$b5
+L0	lda	GEOBUF_RAM,x
+	sta	SCRATCH_RAM
+	inx
+	cpx	#0
+	bne 	L0
 	txa
 L1	sta	GEOBUF_RAM,x	; write 190 bytes to GeoRAM
 	lda	GEOBUF_RAM,x	; read,
 	cmp	GEOBUF_RAM,x	; and compare ...
 	bne	L2		; no good, we can't write
 	inx
-	cpx	#190       
+	cpx	#0
 	bne	L1 
 	lda	REU_PRESENT
 	ora	#$02		; All good, GeoRAM is there
 	sta	REU_PRESENT
-L2	rts
+L2	ldx	#0
+L2a	lda	SCRATCH_RAM,x
+	sta	GEOBUF_RAM,x
+	inx
+	cpx	#0
+	bne	L2a
+	rts
 .)
 
 REU_DETECT:
@@ -251,7 +262,7 @@ IEC_FETCH
 .(
         ; do IEC needful here
         ; CK - A and X need to be offsets, and they're not here.
-        tya
+        ;tya
         ldy     #0
         jsr     UIEC_SEEK
         ldx     #5
