@@ -307,12 +307,13 @@ L3      sta     $0340,x
         ;
         ; hack in UIEC -- this might not work -- latest CK
         ;
-        lda     REU_PRESENT     ; skip for EasyFlash -- already done this
-        bne     L5
-        jsr     UIEC_IDENTIFY
-        bcc     L4
-        lda     #$08
-        sta     REU_PRESENT
+;        lda     REU_PRESENT     ; skip for EasyFlash -- already done this
+;        bne     L5
+;        jsr     UIEC_IDENTIFY
+;        bcc     L4
+
+ 	lda	#0			; temporary override
+	sta	REU_PRESENT
 L4      clc
         jsr     REU_DETECT
         bcs     L5
@@ -468,11 +469,11 @@ VIC_ROW_ADDR_HI
         .byte   >VICSCN+(SCREEN_WIDTH*23)
         .byte   >VICSCN+(SCREEN_WIDTH*24)
 
-EF_START_BANK .byte 0
-EF_BANK .byte 0
-EF_NONRES_PAGE_BASE    .byte 0
-EF_NONRES_BANK_BASE    .byte 0
-SCRATCH                .byte 0
+EF_START_BANK		.byte 0
+EF_BANK			.byte 0
+EF_NONRES_PAGE_BASE	.byte 0
+EF_NONRES_BANK_BASE	.byte 0
+SCRATCH			.byte 0
 
-COLUMNS:        .byte   00
-INTERP_FLAGS:  .byte    0
+COLUMNS			.byte 0
+INTERP_FLAGS		.byte 0
