@@ -290,7 +290,7 @@ PREP_SYSTEM
                                         ; set R6510 to $37 to get ROMs
 	jmp	L1
 L0	
-	;jsr	PREFERENCES_READ
+	jsr	PREFERENCES_READ
 
 L1
         lda     R6510
@@ -372,8 +372,10 @@ L1      jsr     CHRIN
         cpy     #6
         bne     L1
 L5	jsr	CLRCHN
+	clc
 	lda     #5
-        jmp     CLOSE
+        jsr     CLOSE
+	rts
 .)
 
 PREF_FILENAME   .byte   "PREFS,R"
