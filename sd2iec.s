@@ -33,7 +33,7 @@ UIEC_SEEK
         ldy     #>UIEC_SEEK_TXT
 	lda	#6
 	jsr	UIEC_COMMAND
-	jsr	UIEC_CLOSE
+	jsr	CLRCHN
 	rts
 .)
 	
@@ -149,10 +149,10 @@ UIEC_IDENTIFY
 	jsr	UIEC_CHECK_ID
 	bcs	S1	; carry set means it's a UIEC
 
-S0	jsr	UIEC_CLOSE
+S0
 	clc
 	rts
-S1	jsr	UIEC_CLOSE
+S1
 	sec
 	rts
 .)
@@ -221,30 +221,17 @@ U2
 
 UIEC_COMMAND
 .(
-	pha
-        clc
-        tya
-        pha
-        txa
-        pha
-        lda     #15
-        ldx     FA
-        tay
-        jsr     SETLFS
-	pla
-	tax
-	pla
-	tay
-	pla
-        jsr     SETNAM
-        jsr     OPEN
-	rts
-.)
-
-UIEC_CLOSE
-.(
+	stx	L1+1
+	sty	L1+2
 	lda	#15
-	jsr	CLOSE
+	jsr	CHKOUT
+	ldx	#0
+L1	lda	!$FFFF,x
+	jsr	CHROUT
+	inx
+	dey
+	cpy	#0
+	bne	L1
+	jsr	CLRCHN
 	rts
 .)
-

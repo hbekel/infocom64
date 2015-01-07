@@ -177,6 +177,23 @@ L3      lda     SECTOR_BUFFER,y
 
 STORY_TEXT:     .byte   "STORY.DAT,R"
 
+COMMAND_OPEN:
+.(
+	lda	#15
+	ldx	FA
+	tay
+	jsr	SETLFS
+	jsr	OPEN
+	rts
+.)
+
+COMMAND_CLOSE
+.(
+	lda	#15
+	jsr	CLOSE
+	rts
+.)
+
 STORY_OPEN:
 .(
         lda     #5
@@ -216,8 +233,7 @@ CLOSE_ALL_FILES:
 .(
         jsr	CLOSE_SAVE_FILE
         jsr     CLOSE_STORY_FILE
-	lda	#15
-	jsr	CLOSE
+	jsr	COMMAND_CLOSE
         rts
 .)
 
