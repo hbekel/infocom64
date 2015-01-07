@@ -110,6 +110,9 @@ NMINV	=	$318
 ICHKIN	=	$31E
 IBSOUT	=	$326
 VICSCN	=	$400
+
+; BASIC ROM functions -- split this out to own file
+
 BLTU	=	$A3B8
 MAIN1	=	$A49C
 LINKPRG	=	$A533
@@ -366,17 +369,19 @@ CI2ICR	=	$DD0D
 CI2CRA	=	$DD0E
 CI2CRB	=	$DD0F
 
-REU_STATUS	= $DF00
-REU_COMMAND     = $DF01
-REU_CBASE       = $DF02
-REU_RBASE       = $DF04
-REU_TLEN        = $DF07 ; note - $DF08 referred to as REU_TLEN+1 *everywhere*
-REU_INT         = $DF09
-REU_ACR         = $DF0a
+REU_STATUS=	$DF00
+REU_COMMAND =	$DF01
+REU_CBASE = 	$DF02
+REU_RBASE =	$DF04
+REU_TLEN =	$DF07
+REU_INT =	$DF09
+REU_ACR =	$DF0A
 
 GEORAM_RAM =    $DE00
 GEORAM_PAGE =   $DFFE
 GEORAM_BANK =   $DFFF           ; each bank is 16k, *not* 64k!
+
+; KERNAL
 
 POLY1	=	$E043
 POLY2	=	$E059
