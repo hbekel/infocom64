@@ -283,7 +283,8 @@ PREP_SYSTEM
         sta     EASYFLASH_CONTROL       ; EasyFlash now off -- turn on and
                                         ; set R6510 to $37 to get ROMs
 	jmp	L1
-L0	jsr	PREFERENCES_READ
+L0	
+	;jsr	PREFERENCES_READ
 
 L1
         lda     R6510
@@ -323,10 +324,10 @@ L3      sta     $0340,x
         ;
         ; hack in UIEC -- this might not work -- latest CK
         ;
-;        lda     REU_PRESENT     ; skip for EasyFlash -- already done this
-;        bne     L5
-;        jsr     UIEC_IDENTIFY
-;        bcc     L4
+        lda     REU_PRESENT     ; skip for EasyFlash -- already done this
+        bne     L5
+        jsr     UIEC_IDENTIFY
+        bcc     L4
 
  	lda	#0			; temporary override
 	sta	REU_PRESENT

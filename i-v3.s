@@ -170,7 +170,7 @@ L1Ed1a
 	lda     REU_PRESENT
 	and     #$0f		; uIEC-only?
 	cmp     #$08
-	bne     LEd1b
+	bne     L1Ed1z
 	jsr	COMMAND_OPEN	; so that we can seek around ...
 L1Ed1z
 	jsr	STORY_OPEN
