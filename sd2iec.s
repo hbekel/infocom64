@@ -21,9 +21,11 @@ UIEC_BUFFER	= $0900		; sure, why not?
 
 UIEC_SEEK
 .(
+	sta	UIEC_SEEK_TXT+3
+	stx	UIEC_SEEK_TXT+4
+	sty	UIEC_SEEK_TXT+5
+	lda	#0
 	sta	UIEC_SEEK_TXT+2
-	stx	UIEC_SEEK_TXT+3
-	sty	UIEC_SEEK_TXT+4
 
 	lda	#5		; storyfile -- need to separate save channel
 	sta	UIEC_SEEK_TXT+1
