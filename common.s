@@ -329,7 +329,7 @@ L3      sta     $0340,x
         jsr     UIEC_IDENTIFY
         bcc     L4
 
- 	lda	#0			; temporary override
+ 	lda	#8
 	sta	REU_PRESENT
 L4      clc
         jsr     REU_DETECT

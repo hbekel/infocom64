@@ -164,7 +164,7 @@ L5      sec
 IREU_FETCH:
 .(
         lda     REU_PRESENT
-        and     #$0f
+        and     #$07
         cmp     #1
         bne	L1
 	jsr	CBM_REU_FETCH

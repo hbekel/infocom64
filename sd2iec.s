@@ -33,7 +33,6 @@ UIEC_SEEK
         ldy     #>UIEC_SEEK_TXT
 	lda	#6
 	jsr	UIEC_COMMAND
-;	jsr	CLRCHN
 	rts
 .)
 	
