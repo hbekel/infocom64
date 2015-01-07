@@ -166,6 +166,13 @@ L0ED1:  sta     $0C50,x
 	sta	EF_BANK
 	jmp	LEd1b
 L1Ed1a
+				; okay, so not EasyFlash
+	lda     REU_PRESENT
+	and     #$0f		; uIEC-only?
+	cmp     #$08
+	bne     LEd1b
+	jsr	COMMAND_OPEN	; so that we can seek around ...
+L1Ed1z
 	jsr	STORY_OPEN
 LEd1b
 	ldx	#5
