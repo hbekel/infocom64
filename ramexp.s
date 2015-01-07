@@ -31,7 +31,6 @@ GEORAM_DETECT
 L0	lda	GEOBUF_RAM,x
 	sta	SCRATCH_RAM
 	inx
-	cpx	#0
 	bne 	L0
 	txa
 L1	sta	GEOBUF_RAM,x	; write 190 bytes to GeoRAM
@@ -39,7 +38,6 @@ L1	sta	GEOBUF_RAM,x	; write 190 bytes to GeoRAM
 	cmp	GEOBUF_RAM,x	; and compare ...
 	bne	L2		; no good, we can't write
 	inx
-	cpx	#0
 	bne	L1 
 	lda	REU_PRESENT
 	ora	#$02		; All good, GeoRAM is there
@@ -48,7 +46,6 @@ L2	ldx	#0
 L2a	lda	SCRATCH_RAM,x
 	sta	GEOBUF_RAM,x
 	inx
-	cpx	#0
 	bne	L2a
 	rts
 .)
@@ -266,13 +263,17 @@ IEC_FETCH
         ldy     #0
         jsr     UIEC_SEEK
         ldx     #5
+	clc
         jsr     CHKIN
-        ldy     #$00
+	bcc	L0
+	jmp	UIEC_READ_PAGE_ERROR
+L0      ldy     #$00
 L1:     jsr     CHRIN
         sta     SECTOR_BUFFER,y
         iny
         bne     L1
         jsr     CLRCHN
+	clc
 	rts
 .)
 

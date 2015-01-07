@@ -217,6 +217,12 @@ STORY_READ_PAGE_ERROR:
         jmp     FATAL_ERROR
 .)
 
+UIEC_READ_PAGE_ERROR:
+.(
+        lda     #$44
+        jmp     FATAL_ERROR
+.)
+
 CLOSE_SAVE_FILE:
 .(
         lda     #2

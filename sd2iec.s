@@ -8,7 +8,7 @@ UIEC_SAVEROOT_TXT3
         .byte   "MD//INFOSAVE/:000.000000"
 #define	UIEC_REL_OFFSET	14
 UIEC_RESET_TXT
-        .byte   "UI",$0d
+        .byte   "UI"
 UIEC_ID1_TXT
         .byte   "SD2IEC",0
 UIEC_ID2_TXT
@@ -190,7 +190,7 @@ UIEC_SEND_RESET
 .(
         ldx     #<UIEC_RESET_TXT
         ldy     #>UIEC_RESET_TXT
-	lda	#3
+	lda	#2
         jsr     UIEC_COMMAND
         rts
 .)
@@ -202,7 +202,6 @@ UIEC_READ_STATUS
         tay
 U0      sta     UIEC_BUFFER,y
         iny
-        cpy     #$ff
         bne     U0
 
         ldx     #15
