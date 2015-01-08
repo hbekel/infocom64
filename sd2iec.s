@@ -238,3 +238,15 @@ L1	lda	!$FFFF,x
 	clc
 	rts
 .)
+
+UIEC_ONLY
+.(
+	lda	REU_PRESENT
+	and	#$0f
+	cmp	#$08
+	beq	L1
+	clc
+	rts
+L1	sec
+	rts
+.)

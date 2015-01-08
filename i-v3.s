@@ -166,11 +166,9 @@ L0ED1:  sta     $0C50,x
 	sta	EF_BANK
 	jmp	LEd1b
 L1Ed1a
-				; okay, so not EasyFlash
-	lda     REU_PRESENT
-	and     #$0f		; uIEC-only?
-	cmp     #$08
-	bne     L1Ed1z
+	jsr	UIEC_ONLY
+	bcc	L1Ed1z
+	clc
 	jsr	COMMAND_OPEN	; so that we can seek around ...
 L1Ed1z
 	jsr	STORY_OPEN
@@ -758,10 +756,9 @@ L12AA:  sta     Z_VECTOR3,x
 	sta	EF_VEC1+2
 	jmp	L12AA2
 L12AA1
-	lda     REU_PRESENT
-        and     #$0f            ; if uIEC-only, don't re-open and seek to
-        cmp     #$08		; beginning of story file
-	bne	L12AA1a
+	jsr	UIEC_ONLY
+	bcc	L12AA1a
+	clc
 	lda	#0
 	tax
 	tay
@@ -802,10 +799,9 @@ L12F1:  lda     $1F
 	and	#%00000100
 	bne	L12F1a
 	jsr	CLOSE_STORY_FILE	; with uIEC, we need to re-open ...
-	lda     REU_PRESENT
-        and     #$0f            ; uIEC-only?
-        cmp     #$08
-	bne	L12F1a
+	jsr	UIEC_ONLY
+	bcc	L12F1a
+	clc
 	jsr	COMMAND_CLOSE
 	jsr	COMMAND_OPEN
 	jsr	STORY_OPEN
@@ -3453,10 +3449,9 @@ L28CA:  lda     Z_PC,x
         lda     #>Z_LOCAL_VARIABLES
         sta     PAGE_VECTOR+1
 
-	lda     REU_PRESENT
-        and     #$0f            ; uIEC-only?
-        cmp     #$08
-	bne	L28CAa
+	jsr	UIEC_ONLY
+	bcc	L28CAa
+	clc
 	jsr	CLOSE_STORY_FILE
 	jsr	COMMAND_CLOSE
 
@@ -3481,10 +3476,9 @@ L28F3:  jsr     SEND_BUFFER_TO_DISK
         bne     L28F3
 	jsr	CLOSE_SAVE_FILE
 
-        lda     REU_PRESENT
-        and     #$0f            ; uIEC-only?
-        cmp     #$08
-        bne     L28F3a
+	jsr	UIEC_ONLY
+        bcc     L28F3a
+	clc
         jsr     COMMAND_OPEN
         jsr     STORY_OPEN
 L28F3a
@@ -3522,10 +3516,9 @@ L2949:  lda     Z_LOCAL_VARIABLES,x
         lda     #>Z_LOCAL_VARIABLES
         sta     PAGE_VECTOR+1
 
-        lda     REU_PRESENT
-        and     #$0f            ; uIEC-only?
-        cmp     #$08
-        bne     L2949a
+	jsr	UIEC_ONLY
+        bcc     L2949a
+	clc
         jsr     CLOSE_STORY_FILE
         jsr     COMMAND_CLOSE
 
@@ -3546,10 +3539,9 @@ L296B:  lda     STACK,x
         dex
         bpl     L296B
 	jsr	CLOSE_SAVE_FILE
-        lda     REU_PRESENT	; uIEC-only?
-        and     #$0f
-        cmp     #$08
-        bne     L2974
+	jsr	UIEC_ONLY
+        bcc     L2974
+	clc
         jsr     COMMAND_OPEN
         jsr     STORY_OPEN
 L2974
