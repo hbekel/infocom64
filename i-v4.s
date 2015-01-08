@@ -164,6 +164,11 @@ L3	sta     $00,x
         sta     EF_BANK
 	jmp     LEd1b
 L1Ed1a
+	jsr	UIEC_ONLY
+	bcc	L1Ed1b
+	clc
+	jsr	COMMAND_OPEN
+L1Ed1b
 	jsr	STORY_OPEN
 LEd1b
 	ldx	#5
@@ -1117,7 +1122,15 @@ L1	sta     $0A,x
         sta     EF_VEC1+2
 	jmp	L1b
 L1a
-
+        jsr     UIEC_ONLY
+        bcc     L1aa
+        clc
+        lda     #0
+        tax
+        tay
+        jsr     UIEC_SEEK
+        jmp     L1b
+L1aa
 	jsr	STORY_OPEN
 L1b
         jmp     L3
@@ -1156,6 +1169,12 @@ L6	lda     $14
 	and	#%00000100
 	bne	L6a
 	jsr	CLOSE_STORY_FILE
+        jsr     UIEC_ONLY
+        bcc     L6a
+        clc
+        jsr     COMMAND_CLOSE
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
 L6a
         lda     Z_HDR_CHKSUM+1
         cmp     Z_VECTOR4
@@ -2900,7 +2919,15 @@ L21C8:  rts
 
 REU_FETCH
 .(
-	sta     STORY_INDEX+1
+        jsr     UIEC_ONLY
+        bcc     L1
+        clc
+        ldx     STORY_INDEX+1
+        lda     STORY_INDEX
+        jsr     IEC_FETCH
+        jmp     L2
+
+L1	sta     STORY_INDEX+1
         sty     STORY_INDEX
         txa
         clc
@@ -2919,6 +2946,7 @@ REU_FETCH
         tax
 
 	jsr	IREU_FETCH
+L2
 	jsr	SECBUF_TO_PVEC
 	rts
 .)
@@ -4944,6 +4972,14 @@ L3	lda     Z_PC,x
         bpl     L3
         lda     #>Z_LOCAL_VARIABLES		; so save from $0F00-$0FFF
         sta     PAGE_VECTOR+1
+
+        jsr     UIEC_ONLY
+        bcc     L3a
+        clc
+        jsr     CLOSE_STORY_FILE
+        jsr     COMMAND_CLOSE
+
+L3a
 	jsr	SAVEFILE_OPEN_WRITE
 	jsr     SEND_BUFFER_TO_DISK
         bcs     L1
@@ -4965,7 +5001,12 @@ L5	jsr     SEND_BUFFER_TO_DISK
         dec     Z_VECTOR2
         bne     L5
 	jsr	CLOSE_SAVE_FILE
-        jsr     REQUEST_STATUS_LINE_REDRAW
+        jsr     UIEC_ONLY
+        bcc     L6
+        clc
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
+L6	jsr     REQUEST_STATUS_LINE_REDRAW
         lda     $5E
         sta     $5C
         lda     $5D
@@ -4994,6 +5035,14 @@ L35B4:  lda     Z_LOCAL_VARIABLES,x
         bpl     L35B4
         lda     #>Z_LOCAL_VARIABLES	; read in $0F00
         sta     PAGE_VECTOR+1
+
+        jsr     UIEC_ONLY
+        bcc     L35B4a
+        clc
+        jsr     CLOSE_STORY_FILE
+        jsr     COMMAND_CLOSE
+
+L35B4a
 	jsr	SAVEFILE_OPEN_READ
 	bcs	L35D6
 	ldx	#2
@@ -5013,6 +5062,13 @@ L35D8:  lda     STACK,x
         bpl     L35D8
 L35E1
 	jsr	CLOSE_SAVE_FILE
+        jsr     CLOSE_SAVE_FILE
+        jsr     UIEC_ONLY
+        bcc     L35E1a
+        clc
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
+L35E1a
         jsr	REQUEST_STATUS_LINE_REDRAW
         jmp     L141B
 
