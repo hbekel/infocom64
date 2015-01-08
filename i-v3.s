@@ -2065,10 +2065,9 @@ L1AF5:  lda     $2A
 ; 1AF2 (1AEF on non-EasyFlash)
 REU_FETCH
 .(
-	lda	REU_PRESENT
-	and	#$0f			; uIEC?
-	cmp	#$08
-	bne	L1
+        jsr     UIEC_ONLY
+        bcc     L1
+        clc
 	ldx	STORY_INDEX+1
 	lda	STORY_INDEX
 	jsr	IEC_FETCH
