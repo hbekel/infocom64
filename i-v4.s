@@ -5011,11 +5011,13 @@ L5	jsr     SEND_BUFFER_TO_DISK
         dec     Z_VECTOR2
         bne     L5
 	jsr	CLOSE_SAVE_FILE
+
         jsr     UIEC_ONLY
         bcc     L6
         clc
         jsr     COMMAND_OPEN
         jsr     STORY_OPEN
+
 L6	jsr     REQUEST_STATUS_LINE_REDRAW
         lda     $5E
         sta     $5C
@@ -5072,7 +5074,6 @@ L35D8:  lda     STACK,x
         bpl     L35D8
 L35E1
 	jsr	CLOSE_SAVE_FILE
-        jsr     CLOSE_SAVE_FILE
         jsr     UIEC_ONLY
         bcc     L35E1a
         clc
@@ -5121,6 +5122,14 @@ L362B
 	dec     Z_VECTOR2		; 3352
         bne     L3623
 	jsr	CLOSE_SAVE_FILE
+
+        jsr     UIEC_ONLY
+        bcc     L362Ba
+        clc
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
+
+L362Ba
         lda     $0F22
         sta     Z_STACK_POINTER
         lda     $0F23			; 335b
