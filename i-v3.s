@@ -2058,7 +2058,8 @@ REU_FETCH
 	bne	L1
 	ldx	STORY_INDEX+1
 	lda	STORY_INDEX
-	jmp	IEC_FETCH
+	jsr	IEC_FETCH
+	jmp	L2
 
 L1	lda     STORY_INDEX+1		; highbyte (these are big-endian)
         and     #$01			; we only use bank 0 and 1
@@ -2072,6 +2073,7 @@ L1	lda     STORY_INDEX+1		; highbyte (these are big-endian)
         tax
 
 	jsr	IREU_FETCH
+L2
 	jsr	SECBUF_TO_PVEC
 	jmp     L1AC5
 .)
