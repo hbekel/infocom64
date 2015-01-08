@@ -758,6 +758,16 @@ L12AA:  sta     Z_VECTOR3,x
 	sta	EF_VEC1+2
 	jmp	L12AA2
 L12AA1
+	lda     REU_PRESENT
+        and     #$0f            ; if uIEC-only, don't re-open and seek to
+        cmp     #$08		; beginning of story file
+	bne	L12AA1a
+	lda	#0
+	tax
+	tay
+	jsr	UIEC_SEEK
+	jmp	L12AA2
+L12AA1a
 	jsr	STORY_OPEN
 L12AA2
         jmp     L12D2
@@ -791,7 +801,14 @@ L12F1:  lda     $1F
 	lda	REU_PRESENT
 	and	#%00000100
 	bne	L12F1a
-	jsr	CLOSE_STORY_FILE
+	jsr	CLOSE_STORY_FILE	; with uIEC, we need to re-open ...
+	lda     REU_PRESENT
+        and     #$0f            ; uIEC-only?
+        cmp     #$08
+	bne	L12F1a
+	jsr	COMMAND_CLOSE
+	jsr	COMMAND_OPEN
+	jsr	STORY_OPEN
 L12F1a	lda     Z_HDR_CHKSUM+1
         cmp     Z_VECTOR3
         bne     L1314
@@ -3435,6 +3452,15 @@ L28CA:  lda     Z_PC,x
         bpl     L28CA
         lda     #>Z_LOCAL_VARIABLES
         sta     PAGE_VECTOR+1
+
+	lda     REU_PRESENT
+        and     #$0f            ; uIEC-only?
+        cmp     #$08
+	bne	L28CAa
+	jsr	CLOSE_STORY_FILE
+	jsr	COMMAND_CLOSE
+
+L28CAa
 	jsr	SAVEFILE_OPEN_WRITE
         jsr     SEND_BUFFER_TO_DISK
         bcs     L28A3
@@ -3454,6 +3480,14 @@ L28F3:  jsr     SEND_BUFFER_TO_DISK
         dec     Z_VECTOR2
         bne     L28F3
 	jsr	CLOSE_SAVE_FILE
+
+        lda     REU_PRESENT
+        and     #$0f            ; uIEC-only?
+        cmp     #$08
+        bne     L28F3a
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
+L28F3a
         jmp     L1152
 .)
 
@@ -3487,6 +3521,15 @@ L2949:  lda     Z_LOCAL_VARIABLES,x
         bpl     L2949
         lda     #>Z_LOCAL_VARIABLES
         sta     PAGE_VECTOR+1
+
+        lda     REU_PRESENT
+        and     #$0f            ; uIEC-only?
+        cmp     #$08
+        bne     L2949a
+        jsr     CLOSE_STORY_FILE
+        jsr     COMMAND_CLOSE
+
+L2949a
 	jsr	SAVEFILE_OPEN_READ
 	bcs	L2969			; error if file not found
 	ldx	#2
@@ -3503,6 +3546,12 @@ L296B:  lda     STACK,x
         dex
         bpl     L296B
 	jsr	CLOSE_SAVE_FILE
+        lda     REU_PRESENT	; uIEC-only?
+        and     #$0f
+        cmp     #$08
+        bne     L2974
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
 L2974
         jmp     L1146
 
