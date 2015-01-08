@@ -122,6 +122,11 @@ L1146:  sta     $00,x
         lda     EF_START_BANK
         sta     EF_BANK
 L1Ed1a
+        jsr     UIEC_ONLY
+        bcc     L1Ed1b
+        clc
+        jsr     COMMAND_OPEN
+L1Ed1b
 	jsr	STORY_OPEN
 LEd1b
 	ldx	#5
@@ -272,8 +277,11 @@ L129A:  ldx     #<PATIENT
         lda     REU_PRESENT
         and     #%00000100
         bne     L129Aa
+	jsr	UIEC_ONLY
+	bcs	L129Aa
 	jsr	CLOSE_STORY_FILE
 L129Aa
+	clc
         lda     $26
         ora     $25
         beq     L12BE
@@ -1143,8 +1151,15 @@ REU_FETCH
         adc     MAX_RES_PAGE_CALC
         sta     PAGE_VECTOR+1
 
-; REU
+        jsr     UIEC_ONLY
+        bcc     L1
+        clc
+        ldx     STORY_INDEX+1
+        lda     STORY_INDEX
+        jsr     IEC_FETCH
+        jmp     L2
 
+L1
 	lda     STORY_INDEX
         sec
         sbc     Z_BASE_PAGE+1
@@ -1154,6 +1169,7 @@ REU_FETCH
         tax
 
 	jsr	IREU_FETCH
+L2
 	jsr	SECBUF_TO_PVEC
 	rts
 .)
@@ -1282,6 +1298,12 @@ LOAD_NONRESIDENT
         sta     EF_NONRES_BANK_BASE
 	rts
 LQ0a
+        jsr     UIEC_ONLY
+        bcc     LQ0aa
+        clc
+        rts
+
+LQ0aa
         ldy     #$04
         ldx     #$0F
         clc
@@ -1902,6 +1924,15 @@ L1DB0:  sta     $0A,x
         sta     EF_VEC1+2
 	jmp	LQQ1b
 LQQ1a
+        jsr     UIEC_ONLY
+        bcc     LQQ1a1
+        clc
+        lda     #0
+        tax
+        tay
+        jsr     UIEC_SEEK
+        jmp     LQQ1b
+LQQ1a1
 	jsr	STORY_OPEN
 LQQ1b
         jmp     L1DDC
@@ -1941,6 +1972,12 @@ L1E00:  lda     $14
         and     #%00000100
         bne     L1E00a
 	jsr	CLOSE_STORY_FILE
+        jsr     UIEC_ONLY
+        bcc     L1E00a
+        clc
+        jsr     COMMAND_CLOSE
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
 L1E00a
         lda     Z_HDR_CHKSUM+1
         cmp     Z_VECTOR4
@@ -5266,6 +5303,15 @@ L3C43:  lda     ($7D),y
         bpl     L3C43
 L3C4B:  lda     #$0F
         sta     PAGE_VECTOR+1
+
+        jsr     UIEC_ONLY
+        bcc     L3C4Ba
+        clc
+        jsr     CLOSE_STORY_FILE
+        jsr     COMMAND_CLOSE
+
+L3C4Ba
+
 	jsr	SAVEFILE_OPEN_WRITE
         jsr     SEND_BUFFER_TO_DISK
         bcs     L3BF1
@@ -5303,6 +5349,13 @@ L3C88:  jsr     SEND_BUFFER_TO_DISK
 L3C90:  dec     Z_VECTOR2
         bne     L3C88
 	jsr	CLOSE_SAVE_FILE
+
+        jsr     UIEC_ONLY
+        bcc     L3C9C
+        clc
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
+
 L3C9C:  lda     $61
         sta     $5F
         lda     $60
@@ -5334,6 +5387,13 @@ L3D0C:  lda     Z_LOCAL_VARIABLES,x
         bpl     L3D0C
         lda     #>Z_LOCAL_VARIABLES	; $0F
         sta     PAGE_VECTOR+1
+
+        jsr     UIEC_ONLY
+        bcc     L3D0Ca
+        clc
+        jsr     CLOSE_STORY_FILE
+        jsr     COMMAND_CLOSE
+L3D0Ca
 	jsr	SAVEFILE_OPEN_READ
 	bcs	L3D2E
 	ldx	#2
@@ -5347,6 +5407,12 @@ L3D24:  bne     L3D2E
         beq     L3D44
 L3D2E: 
 	jsr	CLOSE_SAVE_FILE
+        jsr     UIEC_ONLY
+        bcc     L3D2Ea
+        clc
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
+L3D2Ea
 	ldx     #$1F
 L3D30:  lda     STACK,x
         sta     Z_LOCAL_VARIABLES,x
@@ -5393,6 +5459,14 @@ L3D7D
 L3D85:  dec     Z_VECTOR2
         bne     L3D7D
 	jsr	CLOSE_SAVE_FILE
+
+        jsr     UIEC_ONLY
+        bcc     L3D85a
+        clc
+        jsr     COMMAND_OPEN
+        jsr     STORY_OPEN
+
+L3D85a
         lda     $0F22
         sta     $66
         lda     $0F23
