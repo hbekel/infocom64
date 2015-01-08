@@ -343,8 +343,11 @@ L12	clc
 	lda	REU_PRESENT
 	and	#%00000100
 	bne	L13a
+	jsr	UIEC_ONLY
+	bcs	L13a
 	jsr	CLOSE_STORY_FILE
 L13a
+	clc
         lda     Z_HDR_START_PC
         sta     Z_PC+1
         lda     Z_HDR_START_PC+1
@@ -2919,6 +2922,13 @@ L21C8:  rts
 
 REU_FETCH
 .(
+	sta     STORY_INDEX+1
+        sty     STORY_INDEX
+        txa
+        clc
+        adc     MAX_RES_PAGE_CALC	; #$FA
+        sta     PAGE_VECTOR+1		; ultimately getting stashed here
+
         jsr     UIEC_ONLY
         bcc     L1
         clc
@@ -2927,12 +2937,7 @@ REU_FETCH
         jsr     IEC_FETCH
         jmp     L2
 
-L1	sta     STORY_INDEX+1
-        sty     STORY_INDEX
-        txa
-        clc
-        adc     MAX_RES_PAGE_CALC	; #$FA
-        sta     PAGE_VECTOR+1		; ultimately getting stashed here
+L1
 ;
 ; REU
 ;
@@ -3061,6 +3066,11 @@ LOAD_NONRESIDENT:
 	rts
 
 L0a
+	jsr	UIEC_ONLY
+	bcc	L0aa
+	clc
+	rts
+L0aa
         ldy     #$04
         ldx     #$0F
         clc
