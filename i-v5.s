@@ -999,14 +999,14 @@ L1708:  lda     $18
         bcc     L1726
         sei
         lda     R6510
-        and     #$FD
+        and     #%11111101
         sta     R6510
         ldy     $14
         lda     ($17),y
         tax
         sei
         lda     R6510
-        ora     #$02
+        ora     #%00000010
         sta     R6510
         cli
         txa

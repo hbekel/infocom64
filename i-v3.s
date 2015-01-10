@@ -47,6 +47,7 @@ Z_STACK_POINTER =	$17
 Z_PC =			$19
 Z_BASE_PAGE =		$26
 Z_RESIDENT_ADDR =	$27
+Z_STORY_INDEX =		$2a
 Z_GLOBALS_ADDR =	$2F
 Z_DICT_ADDR =		$31
 Z_ABBREV_ADDR =		$33
@@ -57,24 +58,14 @@ Z_TEMP1 =		$67
 
 STORY_INDEX =		$70
 PAGE_VECTOR = 		$72
-;EF_START_BANK =		$74	; old SECTOR
-;EF_BANK =		$75	; old TRACK
-
-;EF_NONRES_PAGE_BASE =	$7A
-;SCRATCH =		$7E
-;EF_NONRES_BANK_BASE =	$7F
 
 INPUT_BUFFER =		$0200
 SECTOR_BUFFER =		$0800
 Z_STACK_LO =		$0900
 Z_STACK_HI =		$0A00
+Z_STORY_PAGE_INDEX =	$0c50
 Z_LOCAL_VARIABLES = 	$0D00
 
-;Z_HEADER =		$2E00
-;Z_HEADER =		$3000
-;
-; we now dynamically define Z_HEADER as the first page after interpreter
-;
 Z_HDR_CODE_VERSION =	Z_HEADER + 0
 Z_HDR_MODE_BITS =	Z_HEADER + 1
 Z_HDR_RESIDENT_SIZE =	Z_HEADER + 4
@@ -123,29 +114,29 @@ STARTUP
 
         lda     REU_PRESENT
 	and	#%00001111	; we have to have at least a uIEC ...
-	bne	L0EB5
+	bne	L1
 	lda	#$89
 	jmp	FATAL_ERROR
 
-L0EB5:  lda     #$00
+L1	lda     #$00
         ldx     #$03
-L0EB9:  sta     $00,x		; initialize $03 - $93 to 0
+L2	sta     $00,x		; initialize $03 - $93 to 0
         inx
         cpx     #$8F
-        bcc     L0EB9
+        bcc     L2
         tax
         lda     #$FF
-L0EC3:  sta     $0B00,x
+L3	sta     $0B00,x
         sta     $0BA0,x
         inx
         cpx     #$A0
-        bcc     L0EC3
+        bcc     L3
         lda     #$00
         tax
-L0ED1:  sta     $0C50,x
+L4	sta     Z_STORY_PAGE_INDEX,x
         inx
         cpx     #$A0
-        bcc     L0ED1
+        bcc     L4
         inc     Z_STACK_POINTER
         inc     $18
         inc     $2D
@@ -158,33 +149,33 @@ L0ED1:  sta     $0C50,x
 
 	lda	REU_PRESENT
 	and	#%00000100
-	beq	L1Ed1a
+	beq	L5
 				; set EasyFlash bank to 1, prepping for load
         lda     #$80
         sta     EF_VEC1+2
 	lda	EF_START_BANK
 	sta	EF_BANK
-	jmp	LEd1b
-L1Ed1a
+	jmp	L7
+L5
 	jsr	UIEC_ONLY
-	bcc	L1Ed1z
+	bcc	L6
 	clc
 	jsr	COMMAND_OPEN	; so that we can seek around ...
-L1Ed1z
+L6
 	jsr	STORY_OPEN
-LEd1b
+L7
 	ldx	#5
         jsr     READ_BUFFER
-	bcc	LEd1c
+	bcc	L8
 	jmp	FATAL_ERROR_0E
 
-LEd1c	lda	Z_HDR_CODE_VERSION
+L8	lda	Z_HDR_CODE_VERSION
 	cmp	#4		; handle v1-3
-	bcc	LEd1d
+	bcc	L9
 	lda	#$10
 	jmp	FATAL_ERROR
 
-LEd1d	ldx     Z_HDR_RESIDENT_SIZE
+L9	ldx     Z_HDR_RESIDENT_SIZE
         inx
         stx     Z_RESIDENT_ADDR
         txa
@@ -195,14 +186,15 @@ LEd1d	ldx     Z_HDR_RESIDENT_SIZE
         sec
         sbc     Z_RESIDENT_ADDR+1
         beq     Z_ERROR_0	; resident too big to fit 2e00-cfff
-        bcs     L0F03
-Z_ERROR_0:  lda     #$00
+        bcs     L10
+Z_ERROR_0
+	lda     #0
         jmp     FATAL_ERROR
 
-L0F03:  cmp     #$A0
-        bcc     L0F09
+L10	cmp     #$A0		; magic number - under BASIC ROM?
+        bcc     L11
         lda     #$A0
-L0F09:  sta     $29
+L11	sta     $29
         lda     Z_HDR_MODE_BITS
         ora     #$20
         sta     Z_HDR_MODE_BITS
@@ -235,38 +227,37 @@ L0F09:  sta     $29
 
 ; continue loading resident portion into RAM, regardless of REU presence.
 
-L0F4B:  lda     STORY_INDEX
+L12	lda     STORY_INDEX
         cmp     Z_RESIDENT_ADDR
-        bcs     L0F57
+        bcs     L13
 	lda	REU_PRESENT
 	and	#%00000100
-	bne	L0F4Ba
+	bne	L12a
 	jsr	DO_TWIRLY
-L0F4Ba
+L12a
 	ldx	#5
         jsr     READ_BUFFER
-        jmp     L0F4B
+        jmp     L12
 
 ; If we have an REU, load everything else into it.
 
-L0F57:
+L13
 	lda	REU_PRESENT
 	tax
 	and	#%00000100
-	beq	L0F57a
-			; this will be a no-op, for now jam here
+	beq	L13a
 			; at this point, EF_VEC1+2 has non-res base page and
 			; EF_BANK has non-res base bank ...
 	lda	EF_VEC1+2
 	sta	EF_NONRES_PAGE_BASE
 	lda	EF_BANK
 	sta	EF_NONRES_BANK_BASE
-	jmp	L0F64
-L0F57a
+	jmp	PREP_FOR_RUN
+L13a
 	txa
 	and	#%00001111
 	cmp	#$08
-	beq	L0F64		; no REU, but have uIEC, so we jump right in
+	beq	PREP_FOR_RUN		; uIEC-only, so we jump right in
         jsr     REU_LOAD_STORY
 	jsr	CLOSE_STORY_FILE
 .)
@@ -275,7 +266,9 @@ L0F57a
 ; At this point we've got enough in memory to start execution.  Prep for run.
 ;
 
-L0F64:  lda     Z_HDR_START_PC
+PREP_FOR_RUN
+.(
+	lda     Z_HDR_START_PC
         sta     Z_PC+1
         lda     Z_HDR_START_PC+1
         sta     Z_PC
@@ -283,6 +276,7 @@ L0F64:  lda     Z_HDR_START_PC
         ora     INTERP_FLAGS
         sta     Z_HDR_FLAGS2+1
         jsr     CLEAR_SCREEN
+.)
 
 MAIN_LOOP
 .(
@@ -341,13 +335,16 @@ L0FD9:  lda     Z_CURRENT_OPCODE
         jmp     L106F
 .)
 
-DO_VARIABLE_OPERAND:  ldx     #<JUMP_TABLE_VAR
+DO_VARIABLE_OPERAND
+.(
+	ldx     #<JUMP_TABLE_VAR
         ldy     #>JUMP_TABLE_VAR
         and     #$1F
         cmp     #$0C		; we only handle the first 12 variable opcodes
         bcc     DO_JUMP
         lda     #$01
         jmp     FATAL_ERROR
+.)
 
 DO_JUMP
 .(
@@ -1951,13 +1948,13 @@ FETCH_NEXT_ZBYTE:  lda     $1C
         lda     Z_PC+1
         ldy     $1B
         bne     L1A28
-        cmp     Z_RESIDENT_ADDR
-        bcs     L1A28
+        cmp     Z_RESIDENT_ADDR		; address above resident?
+        bcs     L1A28			; if so, fetch it from storage
         adc     Z_BASE_PAGE
         bne     L1A2F
 L1A28:  ldx     #$00
         stx     $22
-        jsr     L1A82
+        jsr     FETCH_PAGE
 L1A2F:  sta     $1E
         ldx     #$FF
         stx     $1C
@@ -1986,7 +1983,7 @@ L1A4C:  lda     $22
         bne     L1A65
 L1A5E:  ldx     #$00
         stx     $1C
-        jsr     L1A82
+        jsr     FETCH_PAGE
 L1A65:  sta     $24
         ldx     #$FF
         stx     $22
@@ -2004,27 +2001,29 @@ L1A6E:  ldy     $1F
 L1A80:  tay
         rts
 
-L1A82:  sta     $2B
-        sty     $2C
+FETCH_PAGE
+.(
+	sta     Z_STORY_INDEX+1
+        sty     Z_STORY_INDEX+2
         ldx     #$00
-        stx     $2A
+        stx     Z_STORY_INDEX
 L1A8A:  cmp     $0B00,x
         bne     L1A97
         tya
         cmp     $0BA0,x
         beq     L1AC5
-        lda     $2B
-L1A97:  inc     $2A
+        lda     Z_STORY_INDEX+1
+L1A97:  inc     Z_STORY_INDEX
         inx
         cpx     $29
         bcc     L1A8A
         jsr     L1B47
         ldx     $2E
-        stx     $2A
-        lda     $2B
+        stx     Z_STORY_INDEX
+        lda     Z_STORY_INDEX+1
         sta     $0B00,x
         sta     STORY_INDEX
-        lda     $2C
+        lda     Z_STORY_INDEX+2
         and     #$01
         sta     $0BA0,x
         sta     STORY_INDEX+1
@@ -2032,35 +2031,10 @@ L1A97:  inc     $2A
         clc
         adc     Z_RESIDENT_ADDR+1
         sta     PAGE_VECTOR+1
-	jmp	REU_FETCH
 
-L1AC5:  ldy     $2A
-        lda     $0C50,y
-        cmp     $2D
-        beq     L1AF5
-        inc     $2D
-        bne     L1AEE
-        jsr     L1B61
-        ldx     #$00
-L1AD7:  lda     $0C50,x
-        beq     L1AE2
-        sec
-        sbc     $25
-        sta     $0C50,x
-L1AE2:  inx
-        cpx     $29
-        bcc     L1AD7
-        lda     #$00
-        sec
-        sbc     $25
-        sta     $2D
-L1AEE:  lda     $2D
-        ldy     $2A
-        sta     $0C50,y
-L1AF5:  lda     $2A
-        clc
-        adc     Z_RESIDENT_ADDR+1
-        rts
+; we're inlining REU_FETCH -- no reason to keep it separate
+
+;	jsr	REU_FETCH
 
 ; 1AF2 (1AEF on non-EasyFlash)
 REU_FETCH
@@ -2087,7 +2061,38 @@ L1	lda     STORY_INDEX+1		; highbyte (these are big-endian)
 	jsr	IREU_FETCH
 L2
 	jsr	SECBUF_TO_PVEC
-	jmp     L1AC5
+;	rts
+.)
+
+
+L1AC5
+	ldy     Z_STORY_INDEX
+        lda     Z_STORY_PAGE_INDEX,y
+        cmp     $2D
+        beq     L1AF5
+        inc     $2D
+        bne     L1AEE
+        jsr     L1B61
+        ldx     #$00
+L1AD7:  lda     Z_STORY_PAGE_INDEX,x
+        beq     L1AE2
+        sec
+        sbc     $25
+        sta     Z_STORY_PAGE_INDEX,x
+L1AE2:  inx
+        cpx     $29
+        bcc     L1AD7
+        lda     #$00
+        sec
+        sbc     $25
+        sta     $2D
+L1AEE:  lda     $2D
+        ldy     Z_STORY_INDEX
+        sta     Z_STORY_PAGE_INDEX,y
+L1AF5:  lda     Z_STORY_INDEX
+        clc
+        adc     Z_RESIDENT_ADDR+1
+        rts
 .)
 
 FATAL_ERROR_0E
@@ -2096,11 +2101,11 @@ FATAL_ERROR_0E
 
 L1B47:  ldx     #$00
         stx     $2E
-        lda     $0C50
+        lda     Z_STORY_PAGE_INDEX
         inx
-L1B4F:  cmp     $0C50,x
+L1B4F:  cmp     Z_STORY_PAGE_INDEX,x
         bcc     L1B59
-        lda     $0C50,x
+        lda     Z_STORY_PAGE_INDEX,x
         stx     $2E
 L1B59:  inx
         cpx     $29
@@ -2110,16 +2115,16 @@ L1B59:  inx
 
 L1B61:  ldx     #$00
         stx     $2E
-L1B65:  lda     $0C50,x
+L1B65:  lda     Z_STORY_PAGE_INDEX,x
         bne     L1B71
         inx
         cpx     $29
         bcc     L1B65
         bcs     L1B84
 L1B71:  inx
-L1B72:  cmp     $0C50,x
+L1B72:  cmp     Z_STORY_PAGE_INDEX,x
         bcc     L1B7F
-        ldy     $0C50,x
+        ldy     Z_STORY_PAGE_INDEX,x
         beq     L1B7F
         tya
         stx     $2E

@@ -1,11 +1,11 @@
 ; $Id$
 
 UIEC_SAVEROOT_TXT1
-        .byte   "MD//INFOSAVE",0
+        .byte   "MD", $2f, $2f, "INFOSAVE",0
 UIEC_SAVEROOT_TXT2
-        .byte   "CD//INFOSAVE",0
+        .byte   "CD", $2f, $2f, "INFOSAVE",0
 UIEC_SAVEROOT_TXT3
-        .byte   "MD//INFOSAVE/:000.000000"
+        .byte   "MD", $2f, $2f, "INFOSAVE", $2f, ":000.000000"
 #define	UIEC_REL_OFFSET	14
 UIEC_RESET_TXT
         .byte   "UI"
@@ -13,7 +13,6 @@ UIEC_ID1_TXT
         .byte   "SD2IEC",0
 UIEC_ID2_TXT
 	.byte	"UIEC",0
-;	.byte	"(C) ",0
 UIEC_SEEK_TXT
 	.byte	"P", 0, 0, 0, 0, 0
 

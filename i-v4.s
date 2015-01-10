@@ -36,6 +36,9 @@
 
 #include "c64.inc"
 
+MAP_RAM =		%11111100
+MAP_ROM =		%00000010
+
 REU_PRESENT =           $02     ; 0 (0000) = no REU (death mode)
                                 ; 1 (0001) = CBM REU
                                 ; 2 (0010) = GeoRAM
@@ -2740,19 +2743,19 @@ L20AC:  lda     Z_VECTOR3+1
 ; grab #$ff bytes from from ($(17)+$14)
 
 FETCH_BYTE_FROM_VECTOR:
-	lda     Z_CURRENT_PHYS_PC_ALT+1
-        cmp     #$E0
-        bcc     L20C2
+;	lda     Z_CURRENT_PHYS_PC_ALT+1
+;        cmp     #$E0
+;        bcc     L20C2
         sei
         lda     R6510
-        and     #$FD
+        and     #MAP_RAM
         sta     R6510
 L20C2:  ldy     $14
         lda     (Z_CURRENT_PHYS_PC_ALT),y
         tax
         sei
         lda     R6510
-        ora     #$02
+        ora     #MAP_ROM
         sta     R6510
         cli
         txa
@@ -2764,19 +2767,19 @@ L20D7:  tay
 
 FETCH_NEXT_ZBYTE:
 .(
-	lda     Z_CURRENT_PHYS_PC+1
-        cmp     #$E0			; under KERNAL?
-        bcc     L1
+;	lda     Z_CURRENT_PHYS_PC+1
+;        cmp     #$E0			; under KERNAL?
+;        bcc     L1
         sei
         lda     R6510
-        and     #$FD
+        and     #MAP_RAM
         sta     R6510
 L1	ldy     Z_PC
         lda     (Z_CURRENT_PHYS_PC),y
         tax
         sei
         lda     R6510
-        ora     #$02
+        ora     #MAP_ROM
         sta     R6510
         cli
         txa
@@ -5171,7 +5174,7 @@ SECBUF_TO_PVEC:
 .(
         sei
         lda     R6510
-        and     #%11111101
+        and     #MAP_RAM
         sta     R6510
         ldy     #$00
 L1	lda     SECTOR_BUFFER,y
@@ -5180,7 +5183,7 @@ L1	lda     SECTOR_BUFFER,y
         bne     L1
         sei
         lda     R6510			; unilaterally turn kernel back on
-        ora     #%00000010
+        ora     #MAP_ROM
         sta     R6510
         cli
 	inc     STORY_INDEX
