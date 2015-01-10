@@ -114,8 +114,7 @@ SAVEFILE_OPEN_READ:
         ldx     #<REST_FILENAME
         ldy     #>REST_FILENAME
         jsr     SETNAM
-        jsr     OPEN
-        rts                     ; pass along carry bit to caller
+        jmp     OPEN
 .)
 
 SAVEFILE_OPEN_WRITE:
@@ -183,15 +182,13 @@ COMMAND_OPEN:
 	ldx	FA
 	tay
 	jsr	SETLFS
-	jsr	OPEN
-	rts
+	jmp	OPEN
 .)
 
 COMMAND_CLOSE
 .(
 	lda	#15
-	jsr	CLOSE
-	rts
+	jmp	CLOSE
 .)
 
 STORY_OPEN:
@@ -205,10 +202,8 @@ STORY_OPEN:
         ldy     #>STORY_TEXT
         jsr     SETNAM
         jsr     OPEN
-        bcc     L1
-        lda     #45
-        jmp     FATAL_ERROR
-L1	rts
+        bcs	STORY_READ_PAGE_ERROR
+	rts
 .)
 
 STORY_READ_PAGE_ERROR:
@@ -239,8 +234,7 @@ CLOSE_ALL_FILES:
 .(
         jsr	CLOSE_SAVE_FILE
         jsr     CLOSE_STORY_FILE
-	jsr	COMMAND_CLOSE
-        rts
+	jmp	COMMAND_CLOSE
 .)
 
 TWIRLY: .byte   188, 172, 187, 190
@@ -298,11 +292,10 @@ L1
         ora     #%00000110
         sta     R6510
 
+        asl     MSGFLG
         lda     #$00
-        sta     MSGFLG
         sta     INTERP_FLAGS
         ldx     #$1C
-        lda     #$00
 L2      sta     SIDBASE,x
         dex
         bpl     L2
@@ -362,20 +355,17 @@ PREFERENCES_READ:
         bcs     L5
         ldy     #$00
 L1      jsr     CHRIN
-        tax
-        jsr     READST
-        and     #$40
-        bne     L5
-        txa
         sta     PREF_FG_COLOR,y
+        jsr     READST                  ; EOF yet?
+        and     #$40
+        bne     L5                      ; might be wrong
         iny
         cpy     #6
         bne     L1
 L5	jsr	CLRCHN
 	clc
 	lda     #5
-        jsr     CLOSE
-	rts
+        jmp     CLOSE
 .)
 
 PREF_FILENAME   .byte   "PREFS,R"
