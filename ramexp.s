@@ -24,8 +24,8 @@ REU_BANKS
 
 GEORAM_DETECT
 .(
-	ldx	#0
 	lda	#0
+	tax
 	sta	GEOBUF_BANK
 	sta	GEOBUF_PAGE	; GeoRAM $0000
 L0	lda	GEOBUF_RAM,x
@@ -125,8 +125,8 @@ L2      sta     SECTOR_BUFFER,y
         sta     REU_CBASE
         lda     #$FC
         sta     REU_COMMAND
-        lda     #$00
-        ldy     #$00
+        lda     #0
+        tay
 L3      sta     SECTOR_BUFFER,y
         iny
         bne     L3
@@ -180,9 +180,8 @@ DIE	jmp     DIE
 
 CBM_REU_FETCH
 .(
-        tya                             ; pla
         stx     REU_RBASE+2             ; REU bank (derived S_I+1)
-        sta     REU_RBASE+1             ; REU page (derived S_I)
+        sty     REU_RBASE+1             ; REU page (derived S_I)
         lda     #$00
         sta     REU_RBASE               ; always 0
         sta     REU_INT
@@ -201,7 +200,7 @@ CBM_REU_FETCH
 
 GEORAM_FETCH
 .(
-        tya                             ; pla
+        tya
         jsr     SHIFT_ADDRESS
         stx     GEORAM_PAGE
         sta     GEORAM_BANK
@@ -216,7 +215,7 @@ L1	lda     GEORAM_RAM,y
 
 EASYFLASH_FETCH
 .(
-        tya                             ; pla
+        tya
         jsr     SHIFT_ADDRESS
         sta     EF_BANK
         txa
@@ -257,9 +256,6 @@ L2	lda     !$0000,y
 
 IEC_FETCH
 .(
-        ; do IEC needful here
-        ; CK - A and X need to be offsets, and they're not here.
-        ;tya
         ldy     #0
         jsr     UIEC_SEEK
         ldx     #5
@@ -267,7 +263,7 @@ IEC_FETCH
         jsr     CHKIN
 	bcc	L0
 	jmp	UIEC_READ_PAGE_ERROR
-L0      ldy     #$00
+L0      ldy     #0
 L1:     jsr     CHRIN
         sta     SECTOR_BUFFER,y
         iny
