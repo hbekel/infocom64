@@ -32,8 +32,7 @@ UIEC_SEEK
         ldx     #<UIEC_SEEK_TXT
         ldy     #>UIEC_SEEK_TXT
 	lda	#6
-	jsr	UIEC_COMMAND
-	rts
+	jmp	UIEC_COMMAND
 .)
 	
 
@@ -64,6 +63,7 @@ U1	lda	UIEC_BCD,y
 	iny
 	cpy	#3
 	bne	U1
+	rts
 .)
 
 ; stolen from http://forum.6502.org/viewtopic.php?p=7637
@@ -102,7 +102,7 @@ CNVBIT:
 	dex			; And repeat for next bit
 	bne	CNVBIT
 	cld			; Back to binary
-
+	rts
 .)
 
 UIEC_SWITCH_TO_MD
@@ -174,7 +174,6 @@ U3      sec             ; found it!
 
 U4	ldy	#0	; nope, try alternate ID
 U5	lda	UIEC_ID2_TXT,y	
-;	cmp	#0
 	beq	U3
 U6	cmp	UIEC_BUFFER+3,y
 	bne	U7
@@ -191,8 +190,7 @@ UIEC_SEND_RESET
         ldx     #<UIEC_RESET_TXT
         ldy     #>UIEC_RESET_TXT
 	lda	#2
-        jsr     UIEC_COMMAND
-        rts
+        jmp	UIEC_COMMAND
 .)
 
 UIEC_READ_STATUS
@@ -216,7 +214,6 @@ U1      jsr     CHRIN
         bne     U1
 
 U2
-;	jsr	CLRCHN
 	clc
 	rts
 .)
