@@ -7,8 +7,6 @@
 
 #include "c64.inc"
 
-#define	CK_PREFS
-
 REU_PRESENT =		$02
 
 Z_VECTOR1 =		$04
@@ -60,16 +58,6 @@ Z_HDR_EXTENSION_ADDR =	Z_HEADER + $36
 
 SECTOR_BUFFER = $0800
 SCREEN_WIDTH            = 40
-
-#ifdef	CK_PREFS
-MY_COLOR =		$01
-MY_EXTCOLOR =		$0c
-MY_MORE_COLOR =		$00
-#else
-MY_COLOR =		$01
-MY_EXTCOLOR =		$00
-MY_MORE_COLOR =		$07
-#endif
 
 .word	$1000
 * = $1000
@@ -3930,7 +3918,7 @@ L2D35:  ldx     $52
         lda     #$00
         sta     $52
         sta     $C6
-	lda	PREF_MORE_COLOR		; v4 has #$00
+	lda	#$00 ;PREF_MORE_COLOR		; v4 has #$00
         sta     COLOR
         jsr     L349E
         sty     L32FF
@@ -3946,7 +3934,7 @@ L2D59:  jsr     GETIN
         ldx     L32FE
         clc
         jsr     PLOT
-	lda	PREF_FG_COLOR		; v4 has #$01
+	lda	#$01	; PREF_FG_COLOR		; v4 has #$01
         sta     COLOR
         ldx     #<BLANK_TEXT
         lda     #>BLANK_TEXT

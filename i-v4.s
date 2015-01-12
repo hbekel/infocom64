@@ -4659,9 +4659,9 @@ Z_SPLIT_WINDOW:
         and     #$20 		; do we support sound?
         beq     L2F9E
         ldx     Z_OPERAND1
-        beq     L2F9F
-        cpx     #$18
-        bcs     L2F9E
+        beq     L2F9F		; if zero, unsplit window
+        cpx     #24		; one big screen?
+        bcs     L2F9E		; we don't support that, rts
         lda     $52
         sta     Z_VECTOR2
         stx     $52
@@ -4678,8 +4678,8 @@ L2F7B:  lda     #$17
         bcc     L2F96
         cpx     $52
         bcs     L2F9E
-        ldx     #$17
-        ldy     #$00
+        ldx     #23
+        ldy     #0
         clc
         jmp     PLOT
 
@@ -4721,7 +4721,7 @@ L2FC9:  jsr     L2F7B
         ldy     $78
         jmp     L2FED
 
-L2FD3:  cmp     #$01
+L2FD3:  cmp     #1
         bne     L2F9E		; we handle only windows 0 and 1 :)
         sta     Z_CURRENT_WINDOW		; window 1 (status line)
 				; CK mod - switch to color black

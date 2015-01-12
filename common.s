@@ -348,6 +348,7 @@ PREFERENCES_READ:
         ldx     #<PREF_FILENAME
         ldy     #>PREF_FILENAME
         jsr     SETNAM
+	clc
         jsr     OPEN
         bcs     L5
         ldx     #5
@@ -370,9 +371,19 @@ L5	jsr	CLRCHN
 
 PREF_FILENAME   .byte   "PREFS,R"
 
-PREF_FG_COLOR   .byte   1
-PREF_BG_COLOR   .byte   12 ; 0
-PREF_MORE_COLOR .byte   0 ; 7
+#ifdef  CK_PREFS
+MY_COLOR =              $01
+MY_EXTCOLOR =           $0c
+MY_MORE_COLOR =         $00
+#else
+MY_COLOR =              $01
+MY_EXTCOLOR =           $00
+MY_MORE_COLOR =         $07
+#endif
+
+PREF_FG_COLOR   .byte   MY_COLOR
+PREF_BG_COLOR   .byte   MY_EXTCOLOR
+PREF_MORE_COLOR .byte   MY_MORE_COLOR
 PREF_LOGGER     .byte   0
 PREF_LOG_ADDR   .word   0
 
