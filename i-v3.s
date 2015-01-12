@@ -2775,6 +2775,12 @@ L210B:  lda     #$00
         sta     $60
         rts
 
+; 0OP:188 C 3 show_status
+; (In Version 3 only.) Display and update the status line now (don't wait
+; until the next keyboard input). (In theory this opcode is illegal in later
+; Versions but an interpreter should treat it as nop, because Version 5
+; Release 23 of 'Wishbringer' contains this opcode by accident.)
+
 Z_SHOW_STATUS
 .(
 	sec
