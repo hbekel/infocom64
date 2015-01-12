@@ -3978,6 +3978,7 @@ Z_SET_CURSOR
         dex
         ldy     Z_OPERAND2
         dey
+
 	lda	WHICH_GAME
 	cmp	#2	; Trinity
 	bne	L1b
@@ -4045,25 +4046,34 @@ L1	rts
 
 Z_NOP1:        rts
 
+; VAR:241 11 4 set_text_style style
+; Sets the text style to: Roman (if 0), Reverse Video (if 1), Bold (if 2),
+; Italic (4), Fixed Pitch (8). In some interpreters (though this is not
+; required) a combination of styles is possible (such as reverse video and
+; bold). In these, changing to Roman should turn off all the other styles
+; currently set.
+;
+; CK - this looks like it inherited some code from the C128 port.
+
 Z_SET_TEXT_STYLE
 .(
         lda     Z_HDR_MODE_BITS
         and     #$0A
-        beq     L1	; supports pictures and emphasis?
+        beq     L1	; supports pictures and emphasis? no, return
         ldx     Z_OPERAND1
         bne     L2
-        lda     #$92
+        lda     #$92	; reverse off
         jsr     L4
-        lda     #$82
+        lda     #$82 	; underline off (on C128/80c)
         jmp     L4
 L1	rts
-L2	cpx     #$01
+L2	cpx     #$01	; reverse?
         bne     L3
-        lda     #$12
+        lda     #$12	; reverse PETSCII
         jmp     L4
-L3	cpx     #$04
+L3	cpx     #$04	; italic?
         bne     L1
-        lda     #$02
+        lda     #$02	; underline on (on C128/80c)
 L4	sta     Z_TEMP1
         lda     $68
         bne     L5
@@ -4696,18 +4706,26 @@ Z_SET_WINDOW:
         jsr     L2999
         lda     Z_OPERAND1
         bne     L2FD3
-        lda     #$FF
+        lda     #$FF		; window 0 (main body)
         sta     $4E
         lda     #$00
         sta     $45
+				; CK mod - switch to color white
+	lda	#05
+	jsr	CHROUT
+				; end CK mod
 L2FC9:  jsr     L2F7B
         ldx     $77
         ldy     $78
         jmp     L2FED
 
 L2FD3:  cmp     #$01
-        bne     L2F9E
-        sta     $45
+        bne     L2F9E		; we handle only windows 0 and 1 :)
+        sta     $45		; window 1 (status line)
+				; CK mod - switch to color black
+	lda	#$90
+	jsr	CHROUT
+				; end CK mod
         lda     #$00
         sta     $4E
         sec
