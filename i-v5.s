@@ -19,6 +19,7 @@ Z_PC =			$0e
 Z_BASE_PAGE =		$1a
 STORY_INDEX =		$3a
 PAGE_VECTOR =		$3c
+Z_CURRENT_WINDOW =	$48
 Z_TEMP1 =		$54
 Z_OPERAND1 =		$79
 
@@ -2935,7 +2936,7 @@ L2537:  lda     L32F7
         inc     L32F7
         lda     #$00
         sta     $47
-        sta     $48
+        sta     Z_CURRENT_WINDOW
         beq     L2580
 L255A:  lda     Z_OPERAND1
         sta     $7B
@@ -2955,7 +2956,7 @@ L255A:  lda     Z_OPERAND1
         sta     Z_VECTOR1+1
         jmp     L1560
 
-L2580:  lda     $48
+L2580:  lda     Z_CURRENT_WINDOW
         cmp     L32F8
         bcc     L2598
         lda     $47
@@ -2965,14 +2966,14 @@ L2580:  lda     $48
         lda     #$01
         sta     $47
         lda     #$00
-        sta     $48
+        sta     Z_CURRENT_WINDOW
 L2598:  lda     $47
         sta     Z_VECTOR1
-        lda     $48
+        lda     Z_CURRENT_WINDOW
         sta     Z_VECTOR1+1
         inc     $47
         bne     L25A6
-        inc     $48
+        inc     Z_CURRENT_WINDOW
 L25A6:  jmp     L1560
 .)
 
@@ -3817,7 +3818,7 @@ L2C68:  cmp     #$20
         bcc     L2C82
         ldx     $4E
         sta     $0200,x
-        lda     $48
+        lda     Z_CURRENT_WINDOW
         bne	L2C80
         ldy     $4D
         inc     $4D
@@ -3832,7 +3833,7 @@ L2C83:  sta     Z_TEMP1
         cmp     #$20
         bcc     L2CBF
         jsr     L349E
-        lda     $48
+        lda     Z_CURRENT_WINDOW
         beq     L2C9A
         cpy     #$28
         bcs     L2CBF
@@ -3847,7 +3848,7 @@ L2CA2:  lda     $6A
         beq     L2CAB
         lda     Z_TEMP1
         jsr     PRINT_CHAR_AT_COORDINATE
-L2CAB:  lda     $48
+L2CAB:  lda     Z_CURRENT_WINDOW
         bne     L2CBF
         lda     #$01
         sta     $5B
@@ -3882,7 +3883,7 @@ L2CE0:  cmp     $0200,x
         bne     L2CE0
         ldx     $70
         inx
-        lda     $48
+        lda     Z_CURRENT_WINDOW
         beq     L2CF1
         ldx     #$28
 L2CF1:  stx     $4F
@@ -3910,7 +3911,7 @@ Z_NEW_LINE
         jmp     L2CC2
 
 L2D1A:  ldx     $4E
-        lda     $48
+        lda     Z_CURRENT_WINDOW
         beq     L2D24
         cpx     #$28
         bcs     L2D2B
@@ -3919,7 +3920,7 @@ L2D24:  lda     #$0D
         inc     $4E
 L2D2B:  lda     $6A
 L2D2D:  beq     L2D81
-        lda     $48
+        lda     Z_CURRENT_WINDOW
 L2D31:  bne     L2D35
         inc     $52
 L2D35:  ldx     $52
@@ -3972,7 +3973,7 @@ L2D97:  lda     $0200,x
         inx
         dey
         bne     L2D97
-L2DA1:  lda     $48
+L2DA1:  lda     Z_CURRENT_WINDOW
         bne     L2DA8
         jsr     LOG_TO_PRINTER
 L2DA8:  rts
@@ -4082,7 +4083,7 @@ L2E3F:  lda     $42
 L2E48:  rts
 
 Z_SET_CURSOR   jsr     L2DA9
-        lda     $48
+        lda     Z_CURRENT_WINDOW
         beq     L2E5A
         ldx     Z_OPERAND1
         dex
@@ -4166,7 +4167,7 @@ L2ECE:  iny
         jsr     CHROUT
         jmp     L2ECE
 
-L2EDB:  ldx     $48
+L2EDB:  ldx     Z_CURRENT_WINDOW
         beq     L2EE4
         lda     #$20
         jsr     CHROUT
@@ -4181,7 +4182,7 @@ L2EF1:  rts
 Z_ERASE_WINDOW   jsr     L2DA9
         jsr     L349E
         txa
-        ldx     $48
+        ldx     Z_CURRENT_WINDOW
         sta     L32FC,x
         tya
         sta     L32FA,x
@@ -4277,7 +4278,7 @@ Z_PRINT_TABLE   lda     Z_OPERAND1
         beq     L2FB4
         lda     $7D
 L2FB4:  sta     $0A
-        lda     $48
+        lda     Z_CURRENT_WINDOW
         beq     L2FBD
         jsr     L2DA9
 L2FBD:  jsr     L349E
@@ -4301,12 +4302,12 @@ L2FC6:  jsr     L1708
 L2FE8:  rts
 
 Z_SET_FONT   lda     Z_OPERAND1
-        ldx     $48
+        ldx     Z_CURRENT_WINDOW
         cmp     L3307,x
         beq     L2FF7
         jsr     L300B
         bcs     L3008
-L2FF7:  ldx     $48
+L2FF7:  ldx     Z_CURRENT_WINDOW
         lda     L3307,x
         pha
         lda     Z_OPERAND1
@@ -4982,7 +4983,7 @@ L3587:  ldx     #$00
         stx     $55
         stx     $56
         stx     $52
-        stx     $48
+        stx     Z_CURRENT_WINDOW
         lda     #$18
         sta     $53
         rts
@@ -4993,14 +4994,14 @@ Z_SET_WINDOW
         jsr     L2DA9
         jsr     L349E
         txa
-        ldx     $48
+        ldx     Z_CURRENT_WINDOW
         sta     L32FC,x
         tya
         sta     L32FA,x
         lda     Z_OPERAND1
         bne     L35C0
         lda     #$00		; window 0 (main body)
-        sta     $48
+        sta     Z_CURRENT_WINDOW
                                 ; CK mod - switch to color white
         lda     #05
         jsr     CHROUT
@@ -5013,7 +5014,7 @@ L35B2:  jsr     L3558
         bne     L35D7
 L35C0:  cmp     #$01
         bne     L3583		; we handle only windows 0 and 1 :)
-        sta     $48		; window 1 (status line)
+        sta     Z_CURRENT_WINDOW		; window 1 (status line)
                                 ; CK mod - switch to color black
         lda     #$90
         jsr     CHROUT
@@ -5026,7 +5027,7 @@ L35CA:  lda     $70
         sta     $70
         ldx     #$00
         ldy     #$00
-L35D7:  ldx     $48
+L35D7:  ldx     Z_CURRENT_WINDOW
         lda     L32FA,x
         tay
         lda     L32FC,x

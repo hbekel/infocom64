@@ -61,6 +61,8 @@ Z_MAX_SAVES		= $76
 STORY_INDEX		= $37
 PAGE_VECTOR		= $39
 
+Z_CURRENT_WINDOW =	$45
+
 ;EF_START_BANK		= $59	 old SECTOR
 ;EF_BANK			= $5a	 old TRACK
 ;SCRATCH			= $5f	old L5F_CURRENT_DRIVE_UNIT
@@ -2268,7 +2270,7 @@ L1	lda     $61
         inc     $61
         lda     #$00
         sta     $44
-        sta     $45
+        sta     Z_CURRENT_WINDOW
         beq     L3
 L2	lda     Z_OPERAND1
         sta     Z_OPERAND2
@@ -2298,7 +2300,7 @@ L4	lda     Z_OPERAND1+1
         sta     $62
         lda     Z_OPERAND1
         sta     $61
-L5	lda     $45
+L5	lda     Z_CURRENT_WINDOW
         cmp     $62
         bcc     L7
         lda     $44
@@ -2308,14 +2310,14 @@ L5	lda     $45
 L6	lda     #$01
         sta     $44
         lda     #$00
-        sta     $45
+        sta     Z_CURRENT_WINDOW
 L7	lda     $44
         sta     Z_VECTOR1
-        lda     $45
+        lda     Z_CURRENT_WINDOW
         sta     Z_VECTOR1+1
         inc     $44
         bne     L8
-        inc     $45
+        inc     Z_CURRENT_WINDOW
 L8	jmp     L1423
 .)
 
@@ -3696,7 +3698,7 @@ L2861:  cmp     #$20
         ldx     $4B
         sta     INPUT_BUFFER,x
         ldy     $4A
-        lda     $45
+        lda     Z_CURRENT_WINDOW
         bne     L2877
         cpy     #$27
         bcc     L287E
@@ -3715,7 +3717,7 @@ L2883:  sta     Z_TEMP1
         bcc     L28C0
         sec
         jsr     PLOT
-        lda     $45
+        lda     Z_CURRENT_WINDOW
         beq     L289B
         cpy     #SCREEN_WIDTH
         bcs     L28C0
@@ -3730,7 +3732,7 @@ L28A3:  lda     $68
         beq     L28AC
         lda     Z_TEMP1
         jsr     PUT_CHARACTER
-L28AC:  lda     $45
+L28AC:  lda     Z_CURRENT_WINDOW
         bne     L28C0
         lda     #$01
         sta     $58
@@ -3764,7 +3766,7 @@ L28E1:  cmp     INPUT_BUFFER,x
         dex
         bne     L28E1
         ldx     #$27
-        lda     $45
+        lda     Z_CURRENT_WINDOW
         beq     L28F1
         ldx     #SCREEN_WIDTH
 L28F1:  stx     $4C
@@ -3785,7 +3787,7 @@ L2908:  lda     INPUT_BUFFER,x
         bne     L28FC
 
 Z_NEW_LINE:  ldx     $4B
-        lda     $45
+        lda     Z_CURRENT_WINDOW
         beq     L291B
         cpx     #SCREEN_WIDTH
         bcs     L2922
@@ -3794,7 +3796,7 @@ L291B:  lda     #$0D
         inc     $4B
 L2922:  lda     $68
         beq     L2971
-        lda     $45
+        lda     Z_CURRENT_WINDOW
         bne     L292C
 L292A:  inc     $4F
 L292C:  ldx     $4F
@@ -3847,7 +3849,7 @@ L2987:  lda     INPUT_BUFFER,x
         inx
         dey
         bne     L2987
-L2991:  lda     $45
+L2991:  lda     Z_CURRENT_WINDOW
         bne     L2998
         jsr     LOG_TO_PRINTER
 L2998:  rts
@@ -3970,7 +3972,7 @@ Z_SET_CURSOR
 	lda     Z_HDR_MODE_BITS
         and     #$10	; supports fixed-width font?
         beq     L1
-        lda     $45
+        lda     Z_CURRENT_WINDOW
         beq     L1
         lda     $42
         beq     L1
@@ -4107,7 +4109,7 @@ L2AAA:  iny
         lda     #$20
         jsr     CHROUT
         jmp     L2AAA
-L2AB7:  ldx     $45
+L2AB7:  ldx     Z_CURRENT_WINDOW
         beq     L2AC0
         lda     #$20
         jsr     CHROUT
@@ -4709,7 +4711,7 @@ Z_SET_WINDOW:
         lda     #$FF		; window 0 (main body)
         sta     $4E
         lda     #$00
-        sta     $45
+        sta     Z_CURRENT_WINDOW
 				; CK mod - switch to color white
 	lda	#05
 	jsr	CHROUT
@@ -4721,7 +4723,7 @@ L2FC9:  jsr     L2F7B
 
 L2FD3:  cmp     #$01
         bne     L2F9E		; we handle only windows 0 and 1 :)
-        sta     $45		; window 1 (status line)
+        sta     Z_CURRENT_WINDOW		; window 1 (status line)
 				; CK mod - switch to color black
 	lda	#$90
 	jsr	CHROUT
