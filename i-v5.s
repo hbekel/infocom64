@@ -3902,7 +3902,9 @@ L2D08:  lda     $0200,x
         sta     $0200,y
         iny
         bne     L2CFC
-Z_NEW_LINE   ldx     $6C
+
+Z_NEW_LINE
+	ldx     $6C
         beq     L2D1A
         lda     #$0D
         jmp     L2CC2
@@ -3927,13 +3929,13 @@ L2D35:  ldx     $52
         lda     #$00
         sta     $52
         sta     $C6
-	lda	PREF_MORE_COLOR
+	lda	PREF_MORE_COLOR		; v4 has #$00
         sta     COLOR
         jsr     L349E
         sty     L32FF
         stx     L32FE
-        ldx     #<L3313
-        lda     #>L3313
+        ldx     #<MORE_TEXT
+        lda     #>MORE_TEXT
         ldy     #$06
         jsr     PRINT_MESSAGE
 L2D59:  jsr     GETIN
@@ -3943,10 +3945,10 @@ L2D59:  jsr     GETIN
         ldx     L32FE
         clc
         jsr     PLOT
-	lda	PREF_FG_COLOR
+	lda	PREF_FG_COLOR		; v4 has #$01
         sta     COLOR
-        ldx     #<L3319
-        lda     #>L3319
+        ldx     #<BLANK_TEXT
+        lda     #>BLANK_TEXT
         ldy     #$06
         jsr     PRINT_MESSAGE
         ldy     L32FF
@@ -4744,8 +4746,7 @@ TEXT_REVERSE_TOGGLE:  .byte	0
 Z_STATIC_ADDR:  .byte 0
 Z_MAX_SAVES	.byte 0
 
-L3313	.byte	"[MORE]"
-L3319	.byte	"      "
+MORE_TEXT	.byte	"[MORE]"
 
 L334A:  ldx     #$FF
         stx     $0340
