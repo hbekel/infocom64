@@ -20,6 +20,7 @@ Z_BASE_PAGE =		$1a
 STORY_INDEX =		$3a
 PAGE_VECTOR =		$3c
 Z_TEMP1 =		$54
+Z_OPERAND1 =		$79
 
 INPUT_BUFFER            = $0200
 Z_STACK_LO              = $0900
@@ -359,9 +360,9 @@ L1334:  cmp     #$80
         jsr     L14C1
 L133B:  ldx     $8B
         lda     Z_VECTOR1
-        sta     $79,x
+        sta     Z_OPERAND1,x
         lda     Z_VECTOR1+1
-        sta     $7A,x
+        sta     Z_OPERAND1+1,x
         inc     $77
         inx
         inx
@@ -429,9 +430,9 @@ L13BE:  cmp     #$80
 L13C5:  jsr     L14C1
 L13C8:  ldx     $8B
         lda     Z_VECTOR1
-        sta     $79,x
+        sta     Z_OPERAND1,x
         lda     Z_VECTOR1+1
-        sta     $7A,x
+        sta     Z_OPERAND1+1,x
         inc     $77
         inx
         inx
@@ -471,9 +472,9 @@ JUMP_ONE:  and     #$30
 
 L141A:  and     #$20
         bne     L142A
-L141E:  sta     $7A
+L141E:  sta     Z_OPERAND1+1
         jsr     FETCH_NEXT_ZBYTE
-        sta     $79
+        sta     Z_OPERAND1
         inc     $77
         jmp     L1430
 
@@ -494,9 +495,9 @@ L1441	jsr	$FFFF
 
 JUMP_TWO:  and     #$40
         bne     L145C
-        sta     $7A
+        sta     Z_OPERAND1+1
         jsr     FETCH_NEXT_ZBYTE
-        sta     $79
+        sta     Z_OPERAND1
         inc     $77
         jmp     L1462
 
@@ -532,9 +533,9 @@ Z_ERROR_04   lda     #$04
 L149B   jmp     FATAL_ERROR
 
 L149E:  lda     Z_VECTOR1
-        sta     $79
+        sta     Z_OPERAND1
         lda     Z_VECTOR1+1
-        sta     $7A
+        sta     Z_OPERAND1+1
         inc     $77
         rts
 
@@ -746,9 +747,9 @@ L1600:  sta     Z_PC
 
 Z_NOP:  rts
 
-L161B:  lda     $79
+L161B:  lda     Z_OPERAND1
         sta     Z_VECTOR1
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     Z_VECTOR1+1
         rts
 
@@ -1740,8 +1741,8 @@ L1CB7:  clc
         sta     Z_VECTOR2+1
         rts
 
-L1CC3:  lda     $79
-        ldx     $7A
+L1CC3:  lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         ldy     #$0C
         lda     (Z_VECTOR2),y
@@ -1802,8 +1803,8 @@ L1D10:  jsr     L1CFE
 L1D1D:  ldy     #$00
         rts
 
-L1D20:  lda     $79
-        ldx     $7A
+L1D20:  lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         lda     $7B
         cmp     #$10
@@ -1853,8 +1854,8 @@ L1D69:  ldy     #$00
 
 Z_RTRUE:  ldx     #$01
 L1D77:  lda     #$00
-L1D79:  stx     $79
-        sta     $7A
+L1D79:  stx     Z_OPERAND1
+        sta     Z_OPERAND1+1
         jmp     Z_RET
 
 Z_RFALSE:  ldx     #$00
@@ -1995,19 +1996,19 @@ Z_POP   ldx     $69
 
 Z_PIRACY   jmp     L15A5
 
-Z_JZ   lda     $79
-        ora     $7A
+Z_JZ   lda     Z_OPERAND1
+        ora     Z_OPERAND1+1
         beq     L1E5E
 L1E36:  jmp     L1599
 
-Z_GET_SIBLING   lda     $79
-        ldx     $7A
+Z_GET_SIBLING   lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         ldy     #$08
         bne     L1E4D
 
-Z_GET_CHILD   lda     $79
-        ldx     $7A
+Z_GET_CHILD   lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         ldy     #$0A
 L1E4D:  lda     (Z_VECTOR2),y
@@ -2021,8 +2022,8 @@ L1E4D:  lda     (Z_VECTOR2),y
         beq     L1E36
 L1E5E:  jmp     L15A5
 
-Z_GET_PARENT   lda     $79
-        ldx     $7A
+Z_GET_PARENT   lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         ldy     #$06
         lda     (Z_VECTOR2),y
@@ -2031,11 +2032,11 @@ Z_GET_PARENT   lda     $79
         lda     (Z_VECTOR2),y
         jmp     L155C
 
-Z_GET_PROP_LEN   lda     $7A
+Z_GET_PROP_LEN   lda     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
         sta     Z_VECTOR2+1
-        lda     $79
+        lda     Z_OPERAND1
         sec
         sbc     #$01
         sta     Z_VECTOR2
@@ -2054,14 +2055,14 @@ L1E97:  and     #$3F
 L1E99:  ldx     #$00
         jmp     L155C
 
-Z_INC:  lda     $79
+Z_INC:  lda     Z_OPERAND1
         jsr     L14B8
         inc     Z_VECTOR1
         bne     L1EA9
         inc     Z_VECTOR1+1
 L1EA9:  jmp     L1EBE
 
-Z_DEC:  lda     $79
+Z_DEC:  lda     Z_OPERAND1
         jsr     L14B8
         lda     Z_VECTOR1
         sec
@@ -2070,18 +2071,18 @@ Z_DEC:  lda     $79
         lda     Z_VECTOR1+1
         sbc     #$00
         sta     Z_VECTOR1+1
-L1EBE:  lda     $79
+L1EBE:  lda     Z_OPERAND1
         jmp     L1545
 
-Z_PRINT_ADDR   lda     $79
+Z_PRINT_ADDR   lda     Z_OPERAND1
         sta     Z_VECTOR2
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     Z_VECTOR2+1
         jsr     L175E
         jmp     L1A45
 
-Z_REMOVE_OBJ:  lda     $79
-        ldx     $7A
+Z_REMOVE_OBJ:  lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         lda     Z_VECTOR2
         sta     Z_VECTOR3
@@ -2103,9 +2104,9 @@ Z_REMOVE_OBJ:  lda     $79
         tax
         iny
         lda     (Z_VECTOR2),y
-        cmp     $79
+        cmp     Z_OPERAND1
         bne     L1F16
-        cpx     $7A
+        cpx     Z_OPERAND1+1
         bne     L1F16
         ldy     #$08
         lda     (Z_VECTOR3),y
@@ -2124,9 +2125,9 @@ L1F16:  jsr     L1C8F
         tax
         iny
 L1F1F:  lda     (Z_VECTOR2),y
-        cmp     $79
+        cmp     Z_OPERAND1
         bne     L1F16
-        cpx     $7A
+        cpx     Z_OPERAND1+1
         bne     L1F16
         ldy     #$08
         lda     (Z_VECTOR3),y
@@ -2145,8 +2146,8 @@ L1F34:  lda     #$00
         sta     (Z_VECTOR3),y
 L1F43:  rts
 
-Z_PRINT_OBJ   lda     $79
-        ldx     $7A
+Z_PRINT_OBJ   lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         ldy     #$0C
         lda     (Z_VECTOR2),y
@@ -2214,14 +2215,14 @@ L1FC5:  jsr     L161B
 Z_JUMP   jsr     L161B
         jmp     L15DF
 
-Z_PRINT_PADDR   lda     $79
+Z_PRINT_PADDR   lda     Z_OPERAND1
         sta     Z_VECTOR2
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     Z_VECTOR2+1
         jsr     L1A2C
         jmp     L1A45
 
-Z_LOAD   lda     $79
+Z_LOAD   lda     Z_OPERAND1
         jsr     L14B8
         jmp     L1560
 
@@ -2239,9 +2240,9 @@ L1FF7:  lda     $7B
         sta     Z_VECTOR2+1
         jmp     L2020
 
-Z_JG   lda     $79
+Z_JG   lda     Z_OPERAND1
         sta     Z_VECTOR2
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     Z_VECTOR2+1
         jmp     L2018
 
@@ -2270,8 +2271,8 @@ L202F:  lda     Z_VECTOR1+1
 L2039:  bcc     L2067
         jmp     L1599
 
-Z_JIN   lda     $79
-        ldx     $7A
+Z_JIN   lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         ldy     #$06
         lda     (Z_VECTOR2),y
@@ -2284,26 +2285,26 @@ Z_JIN   lda     $79
 L2054:  jmp     L1599
 
 Z_TEST   lda     $7B
-        and     $79
+        and     Z_OPERAND1
         cmp     $7B
 L205D:  bne     L2054
         lda     $7C
-L2061:  and     $7A
+L2061:  and     Z_OPERAND1+1
         cmp     $7C
         bne     L2054
 L2067:  jmp     L15A5
 
-Z_OR   lda     $79
+Z_OR   lda     Z_OPERAND1
 L206C:  ora     $7B
         tax
-        lda     $7A
+        lda     Z_OPERAND1+1
         ora     $7C
         jmp	L1FE7
 
-Z_AND   lda     $79
+Z_AND   lda     Z_OPERAND1
         and     $7B
         tax
-        lda     $7A
+        lda     Z_OPERAND1+1
         and     $7C
         jmp     L1FE7
 
@@ -2345,12 +2346,12 @@ Z_STORE   lda     $7B
         sta     Z_VECTOR1
         lda     $7C
         sta     Z_VECTOR1+1
-        lda     $79
+        lda     Z_OPERAND1
         jmp     L1545
 
 Z_INSERT_OBJ   jsr     Z_REMOVE_OBJ
-        lda     $79
-        ldx     $7A
+        lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         lda     Z_VECTOR2
         sta     Z_VECTOR3
@@ -2367,12 +2368,12 @@ Z_INSERT_OBJ   jsr     Z_REMOVE_OBJ
         ldy     #$0A
         lda     (Z_VECTOR2),y
         sta     $0B
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     (Z_VECTOR2),y
         iny
         lda     (Z_VECTOR2),y
         tax
-        lda     $79
+        lda     Z_OPERAND1
         sta     (Z_VECTOR2),y
         txa
         ora     $0B
@@ -2399,10 +2400,10 @@ L2127:  asl     $7B
         rol     $7C
 L212B:  lda     $7B
         clc
-        adc     $79
+        adc     Z_OPERAND1
         sta     $14
         lda     $7C
-        adc     $7A
+        adc     Z_OPERAND1+1
         sta     $15
         lda     #$00
         adc     #$00
@@ -2449,8 +2450,8 @@ L2183:  sta     Z_VECTOR1
         stx     Z_VECTOR1+1
         jmp     L1560
 
-Z_GET_PROP_ADDR   lda     $79
-        ldx     $7A
+Z_GET_PROP_ADDR   lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         jsr     L1C8F
         ldy     #$0C
         lda     (Z_VECTOR2),y
@@ -2548,19 +2549,19 @@ L2232:  jsr     L1CE1
         ldx     #$00
         jmp     L155C
 
-Z_ADD   lda     $79
+Z_ADD   lda     Z_OPERAND1
         clc
         adc     $7B
         tax
-        lda     $7A
+        lda     Z_OPERAND1+1
         adc     $7C
         jmp     L1FE7
 
-Z_SUB   lda     $79
+Z_SUB   lda     Z_OPERAND1
         sec
         sbc     $7B
         tax
-        lda     $7A
+        lda     Z_OPERAND1+1
         sbc     $7C
         jmp     L1FE7
 
@@ -2570,11 +2571,11 @@ L2257:  ror     L32ED
         ror     $7C
         ror     $7B
         bcc     L2274
-        lda     $79
+        lda     Z_OPERAND1
         clc
         adc     L32EC
         sta     L32EC
-        lda     $7A
+        lda     Z_OPERAND1+1
         adc     L32ED
         sta     L32ED
 L2274:  dex
@@ -2593,13 +2594,13 @@ Z_MOD   jsr     L2296
         lda     L32EB
         jmp     L1FE7
 
-L2296:  lda     $7A
+L2296:  lda     Z_OPERAND1+1
         sta     L32EF
         eor     $7C
         sta     L32EE
-        lda     $79
+        lda     Z_OPERAND1
         sta     L32E8
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     L32E9
         bpl     L22AF
         jsr     L22E0
@@ -2681,8 +2682,8 @@ Z_JE   dec     $77
         lda     #$09
         jmp     FATAL_ERROR
 
-L235A:  lda     $79
-        ldx     $7A
+L235A:  lda     Z_OPERAND1
+        ldx     Z_OPERAND1+1
         cmp     $7B
         bne     L2366
         cpx     $7C
@@ -2708,8 +2709,8 @@ Z_CALL_LN   lda     #$01
         bne     L2390
 Z_CALL   lda     #$00
         sta     L32F9
-L2390:  lda     $79
-        ora     $7A
+L2390:  lda     Z_OPERAND1
+        ora     Z_OPERAND1+1
         bne     L23A1
         lda     L32F9
         beq     L239C
@@ -2728,16 +2729,16 @@ L23A1:  ldx     $68
         lda     $10
         jsr     L1519
         lda     #$00
-        asl     $79
-        rol     $7A
+        asl     Z_OPERAND1
+        rol     Z_OPERAND1+1
         rol
         sta     $10
-        asl     $79
-        rol     $7A
+        asl     Z_OPERAND1
+        rol     Z_OPERAND1+1
         rol     $10
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     Z_PC+1
-        lda     $79
+        lda     Z_OPERAND1
         sta     Z_PC
         jsr     L1797
         jsr     FETCH_NEXT_ZBYTE
@@ -2828,10 +2829,10 @@ L2488:  lda     $7D
 
 L248D:  lda     $7B
         clc
-        adc     $79
+        adc     Z_OPERAND1
         sta     Z_VECTOR2
         lda     $7C
-        adc     $7A
+        adc     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
         sta     Z_VECTOR2+1
@@ -2865,12 +2866,12 @@ L24C8:  lda     #$0A
 L24CD:  lda     #$0B
         jmp     FATAL_ERROR
 
-Z_PRINT_CHAR   lda     $79
+Z_PRINT_CHAR   lda     Z_OPERAND1
         jmp     L2C49
 
-Z_PRINT_NUM   lda     $79
+Z_PRINT_NUM   lda     Z_OPERAND1
         sta     L32E8
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     L32E9
         lda     L32E9
         bpl     L24EE
@@ -2914,8 +2915,8 @@ L251B:  pla
 
 Z_RANDOM
 .(
-	lda     $79
-        ora     $7A
+	lda     Z_OPERAND1
+        ora     Z_OPERAND1+1
         bne     L2537
         sta     L32F7
         sta     L32F8
@@ -2924,11 +2925,11 @@ Z_RANDOM
 L2537:  lda     L32F7
         ora     L32F8
         bne     L2580
-        lda     $7A
+        lda     Z_OPERAND1+1
         bpl     L255A
         eor     #$FF
         sta     L32F8
-        lda     $79
+        lda     Z_OPERAND1
         eor     #$FF
         sta     L32F7
         inc     L32F7
@@ -2936,14 +2937,14 @@ L2537:  lda     L32F7
         sta     $47
         sta     $48
         beq     L2580
-L255A:  lda     $79
+L255A:  lda     Z_OPERAND1
         sta     $7B
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     $7C
         jsr     L3665
-        stx     $79
+        stx     Z_OPERAND1
         and     #$7F
-        sta     $7A
+        sta     Z_OPERAND1+1
         jsr     L2296
         lda     L32EA
         clc
@@ -2975,12 +2976,12 @@ L2598:  lda     $47
 L25A6:  jmp     L1560
 .)
 
-Z_PUSH   ldx     $79
-        lda     $7A
+Z_PUSH   ldx     Z_OPERAND1
+        lda     Z_OPERAND1+1
         jmp     L1519
 
 Z_PULL   jsr     L14E4
-        lda     $79
+        lda     Z_OPERAND1
         jmp     L1545
 
 Z_SCAN_TABLE   lda     $7E
@@ -3001,8 +3002,8 @@ L25CA:  lda     $7F
         sta     L3302
         lda     L3302
         bne     L25E1
-        lda     $79
-        sta     $7A
+        lda     Z_OPERAND1
+        sta     Z_OPERAND1+1
 L25E1:  lda     $7B
         sta     $14
         lda     $7C
@@ -3017,12 +3018,12 @@ L25F0:  lda     $14
         lda     $16
         sta     !$000B
         jsr     L1708
-        cmp     $7A
+        cmp     Z_OPERAND1+1
         bne     L2612
         lda     L3302
         beq     L2645
         jsr     L1708
-        cmp     $79
+        cmp     Z_OPERAND1
         beq     L2645
 L2612:  lda     !$0009
         clc
@@ -3055,10 +3056,10 @@ L2645:  lda     !$0009
         jsr     L1560
         jmp     L15A5
 
-Z_NOT   lda     $79
+Z_NOT   lda     Z_OPERAND1
         eor     #$FF
         sta     Z_VECTOR1
-        lda     $7A
+        lda     Z_OPERAND1+1
         eor     #$FF
         sta     Z_VECTOR1+1
         jmp     L1560
@@ -3073,21 +3074,21 @@ L266D:  lda     $7E
         bcc     L2676
         jmp     L2748
 
-L2676:  lda     $7A
+L2676:  lda     Z_OPERAND1+1
         cmp     $7C
         bcc     L2689
         beq     L2681
         jmp     L26A2
 
-L2681:  lda     $79
+L2681:  lda     Z_OPERAND1
         cmp     $7B
         beq     L2689
         bcs     L26A2
-L2689:  lda     $79
+L2689:  lda     Z_OPERAND1
         clc
         adc     $7D
         sta     Z_VECTOR2
-        lda     $7A
+        lda     Z_OPERAND1+1
         adc     $7E
         cmp     $7C
         bcc     L26A2
@@ -3098,9 +3099,9 @@ L2689:  lda     $79
         bcs     L26DA
 L26A2:  lda     #$00
         sta     $16
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     $15
-        lda     $79
+        lda     Z_OPERAND1
         sta     $14
         jsr     L1777
         lda     $7B
@@ -3130,11 +3131,11 @@ L26DA:  lda     $7D
         lda     $7E
         sta     Z_VECTOR3+1
         jsr     DEC_PAGE_COUNT
-        lda     $79
+        lda     Z_OPERAND1
         clc
         adc     Z_VECTOR3
         sta     Z_VECTOR2
-        lda     $7A
+        lda     Z_OPERAND1+1
         adc     Z_VECTOR3+1
         clc
         adc     Z_BASE_PAGE
@@ -3163,9 +3164,9 @@ L2719:  dec     $0A
         bcs     L2705
         rts
 
-L2721:  lda     $79
+L2721:  lda     Z_OPERAND1
         sta     Z_VECTOR2
-        lda     $7A
+        lda     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
         sta     Z_VECTOR2+1
@@ -3196,7 +3197,7 @@ L2748:  lda     $7D
         inc     $7E
 L275A:  jmp     L26A2
 
-Z_CHECK_ARG_COUNT   lda     $79
+Z_CHECK_ARG_COUNT   lda     Z_OPERAND1
         cmp     L3303
         bcc     L2769
         beq     L2769
@@ -3204,9 +3205,9 @@ Z_CHECK_ARG_COUNT   lda     $79
 
 L2769:  jmp     L15A5
 
-Z_LOG_SHIFT:  lda     $79
+Z_LOG_SHIFT:  lda     Z_OPERAND1
         sta     Z_VECTOR1
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     Z_VECTOR1+1
         lda     $7B
         cmp     #$80
@@ -3229,13 +3230,13 @@ L2788:  lsr     Z_VECTOR1+1
 Z_ART_SHIFT   lda     $7B
         cmp     #$80
         bcc     Z_LOG_SHIFT
-        ldx     $79
+        ldx     Z_OPERAND1
         stx     Z_VECTOR1
-        ldx     $7A
+        ldx     Z_OPERAND1+1
         stx     Z_VECTOR1+1
         eor     #$FF
         tay
-L27A3:  lda     $7A
+L27A3:  lda     Z_OPERAND1+1
         asl
         ror     Z_VECTOR1+1
         ror     Z_VECTOR1
@@ -3243,11 +3244,11 @@ L27A3:  lda     $7A
         bpl     L27A3
         jmp     L1560
 
-Z_AREAD   lda     $7A
+Z_AREAD   lda     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
         sta     $4A
-        lda     $79
+        lda     Z_OPERAND1
         sta     $49
         lda     #$00
         sta     L330E
@@ -3382,11 +3383,11 @@ L28BB:  lda     $28
         sta     $28
         jmp     L2814
 
-Z_TOKENIZE   lda     $7A
+Z_TOKENIZE   lda     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
         sta     $4A
-        lda     $79
+        lda     Z_OPERAND1
         sta     $49
         lda     $7C
         clc
@@ -3411,11 +3412,11 @@ L28F4:  lda     #$00
         sta     L330E
 L28FC:  jmp     L2803
 
-Z_ENCODE_TEXT   lda     $7A
+Z_ENCODE_TEXT   lda     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
         sta     $4A
-        lda     $79
+        lda     Z_OPERAND1
         sta     $49
         lda     $7D
         clc
@@ -3981,7 +3982,7 @@ L2DA9:  jsr     L2D8B
 
 Z_ILLEGAL2   rts
 
-Z_BUFFER_MODE   ldx     $79
+Z_BUFFER_MODE   ldx     Z_OPERAND1
         bne     L2DC1
         jsr     L2D8B
         ldx     #$00
@@ -3995,7 +3996,7 @@ L2DC1:  dex
         stx     $45
 L2DC6:  rts
 
-Z_OUTPUT_STREAM   ldx     $79
+Z_OUTPUT_STREAM   ldx     Z_OPERAND1
         bmi     L2DD8
         dex
         beq     L2DE5
@@ -4081,7 +4082,7 @@ L2E48:  rts
 Z_SET_CURSOR   jsr     L2DA9
         lda     $48
         beq     L2E5A
-        ldx     $79
+        ldx     Z_OPERAND1
         dex
         ldy     $7B
         dey
@@ -4090,9 +4091,9 @@ Z_SET_CURSOR   jsr     L2DA9
 L2E5A:  rts
 
 Z_GET_CURSOR   jsr     L2DA9
-        lda     $79
+        lda     Z_OPERAND1
         sta     Z_VECTOR2
-        lda     $7A
+        lda     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
         sta     Z_VECTOR2+1
@@ -4115,7 +4116,7 @@ Z_GET_CURSOR   jsr     L2DA9
 
 Z_INPUT_STREAM   rts
 
-Z_SET_TEXT_STYLE   ldx     $79
+Z_SET_TEXT_STYLE   ldx     Z_OPERAND1
         bne     L2E92
         lda     #$92
         jsr     L2EA1
@@ -4150,7 +4151,7 @@ L2EB5:  ldx     $4E
         rts
 
 Z_ERASE_LINE   beq     L2EF1
-        lda     $79
+        lda     Z_OPERAND1
         cmp     #$01
         bne     L2EF1
         jsr     L349E
@@ -4182,7 +4183,7 @@ Z_ERASE_WINDOW   jsr     L2DA9
         sta     L32FC,x
         tya
         sta     L32FA,x
-        lda     $79
+        lda     Z_OPERAND1
         beq     L2F1A
         cmp     #$01
         beq     L2F4A
@@ -4256,9 +4257,9 @@ L2F87:  iny
         bne     L2F76
 L2F90:  rts
 
-Z_PRINT_TABLE   lda     $79
+Z_PRINT_TABLE   lda     Z_OPERAND1
         sta     $14
-        lda     $7A
+        lda     Z_OPERAND1+1
         sta     $15
         lda     #$00
         sta     $16
@@ -4297,7 +4298,7 @@ L2FC6:  jsr     L1708
 
 L2FE8:  rts
 
-Z_SET_FONT   lda     $79
+Z_SET_FONT   lda     Z_OPERAND1
         ldx     $48
         cmp     L3307,x
         beq     L2FF7
@@ -4306,7 +4307,7 @@ Z_SET_FONT   lda     $79
 L2FF7:  ldx     $48
         lda     L3307,x
         pha
-        lda     $79
+        lda     Z_OPERAND1
         sta     L3307,x
         pla
         ldx     #$00
@@ -4576,7 +4577,7 @@ L3201:  iny
 L3204:  stx     $5B
         rts
 
-Z_READ_CHAR   lda     $79
+Z_READ_CHAR   lda     Z_OPERAND1
         cmp     #$01
         beq     L3210
         jmp     L1558
@@ -4648,10 +4649,10 @@ L3291:  jmp     L1558
 L3294:  lda     Z_VECTOR2+1
         pha
         lda     Z_VECTOR3+1
-        sta     $7A
+        sta     Z_OPERAND1+1
         pha
         lda     Z_VECTOR3
-        sta     $79
+        sta     Z_OPERAND1
         pha
         ldx     #$01
         stx     $77
@@ -4942,7 +4943,7 @@ L3541:  .byte 0
 
 Z_SPLIT_WINDOW   lda     $55
         sta     Z_VECTOR2
-        ldx     $79
+        ldx     Z_OPERAND1
         beq     L3584
         cpx     #$18
         bcs     L3583
@@ -4985,7 +4986,8 @@ L3587:  ldx     #$00
         sta     $53
         rts
 
-Z_SET_WINDOW   lda     $56
+Z_SET_WINDOW
+	lda     $56
         beq     L3583
         jsr     L2DA9
         jsr     L349E
@@ -4994,10 +4996,14 @@ Z_SET_WINDOW   lda     $56
         sta     L32FC,x
         tya
         sta     L32FA,x
-        lda     $79
+        lda     Z_OPERAND1
         bne     L35C0
-        lda     #$00
+        lda     #$00		; window 0 (main body)
         sta     $48
+                                ; CK mod - switch to color white
+        lda     #05
+        jsr     CHROUT
+                                ; end CK mod
 L35B2:  jsr     L3558
         lda     L3301
         sta     $70
@@ -5005,8 +5011,12 @@ L35B2:  jsr     L3558
         sta     $51
         bne     L35D7
 L35C0:  cmp     #$01
-        bne     L3583
-        sta     $48
+        bne     L3583		; we handle only windows 0 and 1 :)
+        sta     $48		; window 1 (status line)
+                                ; CK mod - switch to color black
+        lda     #$90
+        jsr     CHROUT
+                                ; end CK mod
         lda     #$00
         sta     $51
 L35CA:  lda     $70
@@ -5031,18 +5041,18 @@ Z_PICTURE_DATA   jmp     L1599
 Z_SET_MARGINS   jsr     L2DA9
         lda     $7B
         sta     Z_HDR_STATIC+1
-        lda     $79
+        lda     Z_OPERAND1
         sta     Z_HDR_ROUTINES+1
         lda     #$27
         sec
         sbc     $7B
-        sbc     $79
+        sbc     Z_OPERAND1
         beq     L3612
         bmi     L3612
         sta     $70
         sta     L3301
         jsr     L349E
-        ldy     $79
+        ldy     Z_OPERAND1
         clc
         jmp     PLOT
 L3612:  rts
@@ -5055,7 +5065,7 @@ L3614   jmp     L1599
 Z_SOUND_EFFECT   lda     Z_HDR_MODE_BITS
         and     #$20
         beq     L3629
-        ldx     $79
+        ldx     Z_OPERAND1
         dex
         bne     L3626
         jmp     L363B
@@ -5318,7 +5328,7 @@ L3C4Ba
         lda     L3302
         cmp     #$50
         bne     L3C6A
-        lda     $7A
+        lda     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
         sta     PAGE_VECTOR+1
