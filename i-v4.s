@@ -62,6 +62,7 @@ STORY_INDEX		= $37
 PAGE_VECTOR		= $39
 
 Z_CURRENT_WINDOW =	$45
+Z_CURRENT_WINDOW_HEIGHT = $50
 
 ;EF_START_BANK		= $59	 old SECTOR
 ;EF_BANK			= $5a	 old TRACK
@@ -3724,7 +3725,7 @@ L2883:  sta     Z_TEMP1
         cpx     $52
         bcs     L28C0
         bcc     L28A3
-L289B:  cpy     #$27
+L289B:  cpy     #SCREEN_WIDTH-1
         bcs     L28C0
         cpx     $52
         bcc     L28C0
@@ -3801,7 +3802,7 @@ L2922:  lda     $68
 L292A:  inc     $4F
 L292C:  ldx     $4F
         inx
-        cpx     $50
+        cpx     Z_CURRENT_WINDOW_HEIGHT
         bcc     L2971
         lda     #$00
         sta     $4F
@@ -4093,6 +4094,7 @@ L6	ldx     $4B
 .)
 
 Z_ERASE_LINE
+.(
 	lda     Z_HDR_MODE_BITS
         and     #$10			; do we support fixed-width?
         beq     L2ACB
@@ -4118,9 +4120,12 @@ L2AC0:  ldx     $77
         clc
         jsr     PLOT
         jmp     L3094
-L2ACB:  rts
+.)
+L2ACB	rts				; fixme
 
-Z_ERASE_WINDOW:  lda     Z_HDR_MODE_BITS	; check if game header is good
+Z_ERASE_WINDOW
+.(	
+	lda     Z_HDR_MODE_BITS		; check if game header is good
         and     #$01		
         beq     L2ACB			; return if we are	
         lda     Z_OPERAND1
@@ -4187,6 +4192,7 @@ L2B46:  iny
         inc     Z_VECTOR3+1
         bne     L2B35
 L2B4F:  rts
+.)
 
 Z_READ_CHAR:        lda     Z_OPERAND1
         cmp     #$01
@@ -4671,7 +4677,7 @@ Z_SPLIT_WINDOW:
 L2F7B:  lda     #$17
         sec
         sbc     $52
-        sta     $50
+        sta     Z_CURRENT_WINDOW_HEIGHT
         sec
         jsr     PLOT
         cpx     Z_VECTOR2
@@ -4695,8 +4701,8 @@ L2FA2:  ldx     #$00
         stx     $52
         stx     $53
         stx     $4F
-        lda     #$18
-        sta     $50
+        lda     #24
+        sta     Z_CURRENT_WINDOW_HEIGHT
         rts
 
 Z_SET_WINDOW:
@@ -4734,8 +4740,8 @@ L2FD3:  cmp     #1
         jsr     PLOT
         stx     $77
         sty     $78
-L2FE5:  ldx     #$18
-        stx     $50
+L2FE5:  ldx     #24
+        stx     Z_CURRENT_WINDOW_HEIGHT
         ldx     #$00
         ldy     #$00
 L2FED:  clc
@@ -4827,7 +4833,7 @@ L306B:  lda     #$20
         lda     #>IRQ_HANDLER
         sta     NMINV+1
         cli
-L3094:  ldx     #$18
+L3094:  ldx     #24
 L3096:  lda     VIC_ROW_ADDR_HI,x
         ora     #$80
         sta     $D9,x
