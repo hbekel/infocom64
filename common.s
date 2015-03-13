@@ -1,4 +1,5 @@
 ; $Id$
+;
 
 LOG_TO_PRINTER
 .(
