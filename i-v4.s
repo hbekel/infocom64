@@ -435,10 +435,11 @@ L1247:  lda     $03
 
 JUMP_VAR
 	and     #$1F
+	asl
         tay
-        lda     JUMP_TABLE_VAR_LO,y
+        lda     JUMP_TABLE_VAR,y
         sta     L125F+1
-        lda     JUMP_TABLE_VAR_HI,y
+        lda     JUMP_TABLE_VAR+1,y
         sta     L125F+2
 L125F	jsr	$FFFF
         jmp     MAIN_LOOP
@@ -490,10 +491,11 @@ L129D:  ldx     $8D
 JUMP_ZERO
 .(
 	and     #$0F
+	asl
         tay
-        lda     JUMP_TABLE_ZERO_LO,y
+        lda     JUMP_TABLE_ZERO,y
         sta     L1+1
-        lda     JUMP_TABLE_ZERO_HI,y
+        lda     JUMP_TABLE_ZERO+1,y
         sta     L1+2
 L1	jsr	$FFFF
         jmp     MAIN_LOOP
@@ -522,10 +524,11 @@ L3	jsr     L1384
         jsr     L1361
 L4	lda     $03
         and     #$0F
+	asl
         tay
-        lda     JUMP_TABLE_ONE_LO,y
+        lda     JUMP_TABLE_ONE,y
         sta     L5+1
-        lda     JUMP_TABLE_ONE_HI,y
+        lda     JUMP_TABLE_ONE+1,y
         sta     L5+2
 L5	jsr	$FFFF
         jmp     MAIN_LOOP
@@ -562,10 +565,11 @@ L1338:  jsr     L1384
 L1343:  inc     $79
 L1345:  lda     $03
         and     #$1F
+	asl
         tay
-        lda     JUMP_TABLE_TWO_LO,y
+        lda     JUMP_TABLE_TWO,y
         sta     L1356+1
-        lda     JUMP_TABLE_TWO_HI,y
+        lda     JUMP_TABLE_TWO+1,y
         sta     L1356+2
 L1356:	jsr	$FFFF
         jmp     MAIN_LOOP
@@ -815,214 +819,109 @@ REQUEST_STATUS_LINE_REDRAW
         rts
 .)
 
-JUMP_TABLE_ZERO_HI:
-	.byte	>Z_RTRUE
-	.byte	>Z_RFALSE
-	.byte	>Z_PRINT_LITERAL
-	.byte	>Z_PRINT_RET_LITERAL
-	.byte	>Z_NOP
-	.byte	>Z_SAVE		; v4 returns status
-	.byte	>Z_RESTORE	; v4 returns status
-	.byte	>Z_RESTART
-	.byte	>Z_RET_POPPED
-	.byte	>Z_POP
-	.byte	>Z_QUIT
-	.byte	>Z_NEW_LINE
-	.byte	>Z_SHOW_STATUS	; v4 this is illegal!
-	.byte	>Z_VERIFY
-	.byte	>Z_ERROR_02	; v4 illegal
-	.byte	>Z_ERROR_02	; v4 illegal
+JUMP_TABLE_ZERO:
+	.word	Z_RTRUE
+	.word	Z_RFALSE
+	.word	Z_PRINT_LITERAL
+	.word	Z_PRINT_RET_LITERAL
+	.word	Z_NOP
+	.word	Z_SAVE		; v4 returns status
+	.word	Z_RESTORE	; v4 returns status
+	.word	Z_RESTART
+	.word	Z_RET_POPPED
+	.word	Z_POP
+	.word	Z_QUIT
+	.word	Z_NEW_LINE
+	.word	Z_SHOW_STATUS	; v4 this is illegal!
+	.word	Z_VERIFY
+	.word	Z_ERROR_02	; v4 illegal
+	.word	Z_ERROR_02	; v4 illegal
 
-JUMP_TABLE_ZERO_LO:
-	.byte	<Z_RTRUE
-	.byte	<Z_RFALSE
-	.byte	<Z_PRINT_LITERAL
-	.byte	<Z_PRINT_RET_LITERAL
-	.byte	<Z_NOP
-	.byte	<Z_SAVE
-	.byte	<Z_RESTORE
-	.byte	<Z_RESTART
-	.byte	<Z_RET_POPPED
-	.byte	<Z_POP
-	.byte	<Z_QUIT
-	.byte	<Z_NEW_LINE
-	.byte	<Z_SHOW_STATUS
-	.byte	<Z_VERIFY
-	.byte	<Z_ERROR_02
-	.byte	<Z_ERROR_02
+JUMP_TABLE_ONE:
+	.word	Z_JZ
+	.word	Z_GET_SIBLING
+	.word	Z_GET_CHILD
+	.word	Z_GET_PARENT
+	.word	Z_GET_PROP_LEN
+	.word	Z_INC
+	.word	Z_DEC
+	.word	Z_PRINT_ADDR
+	.word	Z_CALL		; actually Z_CALL_LS
+	.word	Z_REMOVE_OBJ
+	.word	Z_PRINT_OBJ
+	.word	Z_RET
+	.word	Z_JUMP
+	.word	Z_PRINT_PADDR
+	.word	Z_LOAD
+	.word	Z_NOT
 
-JUMP_TABLE_ONE_HI:
-	.byte	>Z_JZ
-	.byte	>Z_GET_SIBLING
-	.byte	>Z_GET_CHILD
-	.byte	>Z_GET_PARENT
-	.byte	>Z_GET_PROP_LEN
-	.byte	>Z_INC
-	.byte	>Z_DEC
-	.byte	>Z_PRINT_ADDR
-	.byte	>Z_CALL		; actually Z_CALL_LS
-	.byte	>Z_REMOVE_OBJ
-	.byte	>Z_PRINT_OBJ
-	.byte	>Z_RET
-	.byte	>Z_JUMP
-	.byte	>Z_PRINT_PADDR
-	.byte	>Z_LOAD
-	.byte	>Z_NOT
+JUMP_TABLE_TWO:
+	.word	Z_ERROR_04
+	.word	Z_JE
+	.word	Z_JL
+	.word	Z_JG
+	.word	Z_DEC_CHK
+	.word	Z_INC_CHK
+	.word	Z_JIN
+	.word	Z_TEST
+	.word	Z_OR
+	.word	Z_AND
+	.word	Z_TEST_ATTR
+	.word	Z_SET_ATTR
+	.word	Z_CLEAR_ATTR
+	.word	Z_STORE
+	.word	Z_INSERT_OBJ
+	.word	Z_LOADW
+	.word	Z_LOADB
+	.word	Z_GET_PROP
+	.word	Z_GET_PROP_ADDR
+	.word	Z_GET_NEXT_PROP
+	.word	Z_ADD
+	.word	Z_SUB
+	.word	Z_MUL
+	.word	Z_DIV
+	.word	Z_MOD
+	.word	Z_CALL		; only v4 addition
+	.word	Z_ERROR_04
+	.word	Z_ERROR_04
+	.word	Z_ERROR_04
+	.word	Z_ERROR_04
+	.word	Z_ERROR_04
+	.word	Z_ERROR_04
 
-JUMP_TABLE_ONE_LO:	
-	.byte	<Z_JZ
-	.byte	<Z_GET_SIBLING
-	.byte	<Z_GET_CHILD
-	.byte	<Z_GET_PARENT
-	.byte	<Z_GET_PROP_LEN
-	.byte	<Z_INC
-	.byte	<Z_DEC
-	.byte	<Z_PRINT_ADDR
-	.byte	<Z_CALL
-	.byte	<Z_REMOVE_OBJ
-	.byte	<Z_PRINT_OBJ
-	.byte	<Z_RET
-	.byte	<Z_JUMP
-	.byte	<Z_PRINT_PADDR
-	.byte	<Z_LOAD
-	.byte	<Z_NOT
-
-JUMP_TABLE_TWO_HI:
-	.byte	>Z_ERROR_04
-	.byte	>Z_JE
-	.byte	>Z_JL
-	.byte	>Z_JG
-	.byte	>Z_DEC_CHK
-	.byte	>Z_INC_CHK
-	.byte	>Z_JIN
-	.byte	>Z_TEST
-	.byte	>Z_OR
-	.byte	>Z_AND
-	.byte	>Z_TEST_ATTR
-	.byte	>Z_SET_ATTR
-	.byte	>Z_CLEAR_ATTR
-	.byte	>Z_STORE
-	.byte	>Z_INSERT_OBJ
-	.byte	>Z_LOADW
-	.byte	>Z_LOADB
-	.byte	>Z_GET_PROP
-	.byte	>Z_GET_PROP_ADDR
-	.byte	>Z_GET_NEXT_PROP
-	.byte	>Z_ADD
-	.byte	>Z_SUB
-	.byte	>Z_MUL
-	.byte	>Z_DIV
-	.byte	>Z_MOD
-	.byte	>Z_CALL		; only v4 addition
-	.byte	>Z_ERROR_04
-	.byte	>Z_ERROR_04
-	.byte	>Z_ERROR_04
-	.byte	>Z_ERROR_04
-	.byte	>Z_ERROR_04
-	.byte	>Z_ERROR_04
-
-
-JUMP_TABLE_TWO_LO:
-	.byte	<Z_ERROR_04
-	.byte	<Z_JE
-	.byte	<Z_JL
-	.byte	<Z_JG
-	.byte	<Z_DEC_CHK
-	.byte	<Z_INC_CHK
-	.byte	<Z_JIN
-	.byte	<Z_TEST
-	.byte	<Z_OR
-	.byte	<Z_AND
-	.byte	<Z_TEST_ATTR
-	.byte	<Z_SET_ATTR
-	.byte	<Z_CLEAR_ATTR
-	.byte	<Z_STORE
-	.byte	<Z_INSERT_OBJ
-	.byte	<Z_LOADW
-	.byte	<Z_LOADB
-	.byte	<Z_GET_PROP
-	.byte	<Z_GET_PROP_ADDR
-	.byte	<Z_GET_NEXT_PROP
-	.byte	<Z_ADD
-	.byte	<Z_SUB
-	.byte	<Z_MUL
-	.byte	<Z_DIV
-	.byte	<Z_MOD
-	.byte	<Z_CALL			; from here v4+
-	.byte	<Z_ERROR_04		; these are v5+
-	.byte	<Z_ERROR_04
-	.byte	<Z_ERROR_04
-	.byte	<Z_ERROR_04
-	.byte	<Z_ERROR_04
-	.byte	<Z_ERROR_04
-
-JUMP_TABLE_VAR_HI:
-	.byte	>Z_CALL			; 0
-	.byte	>Z_STOREW		; 1
-	.byte	>Z_STOREB		; 2
-	.byte	>Z_PUT_PROP		; 3
-	.byte	>Z_SREAD		; 4
-	.byte	>Z_PRINT_CHAR		; 5
-	.byte	>Z_PRINT_NUM		; 6
-	.byte	>Z_RANDOM		; 7
-	.byte	>Z_PUSH			; 8
-	.byte	>Z_PULL			; 9
-	.byte	>Z_SPLIT_WINDOW		; a
-	.byte	>Z_SET_WINDOW		; b
-	.byte	>Z_CALL			; c - from here v4+
-	.byte	>Z_ERASE_WINDOW		; d
-	.byte	>Z_ERASE_LINE		; e
-	.byte	>Z_SET_CURSOR		; f
-	.byte	>Z_NOP1		; 10
-	.byte	>Z_SET_TEXT_STYLE		; 11
-	.byte	>Z_BUFFER_MODE		; 12
-	.byte	>Z_OUTPUT_STREAM		; 13
-	.byte	>Z_NOP1		; 14
-	.byte	>Z_SOUND_EFFECT		; 15
-	.byte	>Z_READ_CHAR		; 16
-	.byte	>Z_SCAN_TABLE		; 17
-	.byte	>Z_ERROR_01		; these are v5+
-	.byte	>Z_ERROR_01
-	.byte	>Z_ERROR_01
-	.byte	>Z_ERROR_01
-	.byte	>Z_ERROR_01
-	.byte	>Z_ERROR_01
-	.byte	>Z_ERROR_01
-	.byte	>Z_ERROR_01
-
-JUMP_TABLE_VAR_LO:
-	.byte	<Z_CALL
-	.byte	<Z_STOREW
-	.byte	<Z_STOREB
-	.byte	<Z_PUT_PROP
-	.byte	<Z_SREAD
-	.byte	<Z_PRINT_CHAR
-	.byte	<Z_PRINT_NUM
-	.byte	<Z_RANDOM
-        .byte   <Z_PUSH          ; 8
-        .byte   <Z_PULL          ; 9
-        .byte   <Z_SPLIT_WINDOW          ; a
-        .byte   <Z_SET_WINDOW          ; b
-        .byte   <Z_CALL         ; c - from here v4+
-        .byte   <Z_ERASE_WINDOW          ; d
-        .byte   <Z_ERASE_LINE          ; e
-        .byte   <Z_SET_CURSOR          ; f
-        .byte   <Z_NOP1          ; 10
-        .byte   <Z_SET_TEXT_STYLE          ; 11
-        .byte   <Z_BUFFER_MODE          ; 12
-        .byte   <Z_OUTPUT_STREAM          ; 13
-        .byte   <Z_NOP1          ; 14
-        .byte   <Z_SOUND_EFFECT          ; 15
-        .byte   <Z_READ_CHAR          ; 16
-        .byte   <Z_SCAN_TABLE          ; 17
-	.byte	<Z_ERROR_01
-	.byte	<Z_ERROR_01
-	.byte	<Z_ERROR_01
-	.byte	<Z_ERROR_01
-	.byte	<Z_ERROR_01
-	.byte	<Z_ERROR_01
-	.byte	<Z_ERROR_01
-	.byte	<Z_ERROR_01
+JUMP_TABLE_VAR:
+	.word	Z_CALL			; 0
+	.word	Z_STOREW		; 1
+	.word	Z_STOREB		; 2
+	.word	Z_PUT_PROP		; 3
+	.word	Z_SREAD			; 4
+	.word	Z_PRINT_CHAR		; 5
+	.word	Z_PRINT_NUM		; 6
+	.word	Z_RANDOM		; 7
+	.word	Z_PUSH			; 8
+	.word	Z_PULL			; 9
+	.word	Z_SPLIT_WINDOW		; a
+	.word	Z_SET_WINDOW		; b
+	.word	Z_CALL			; c - from here v4+
+	.word	Z_ERASE_WINDOW		; d
+	.word	Z_ERASE_LINE		; e
+	.word	Z_SET_CURSOR		; f
+	.word	Z_NOP1			; 10
+	.word	Z_SET_TEXT_STYLE	; 11
+	.word	Z_BUFFER_MODE		; 12
+	.word	Z_OUTPUT_STREAM		; 13
+	.word	Z_NOP1			; 14
+	.word	Z_SOUND_EFFECT		; 15
+	.word	Z_READ_CHAR		; 16
+	.word	Z_SCAN_TABLE		; 17
+	.word	Z_ERROR_01		; these are v5+
+	.word	Z_ERROR_01
+	.word	Z_ERROR_01
+	.word	Z_ERROR_01
+	.word	Z_ERROR_01
+	.word	Z_ERROR_01
+	.word	Z_ERROR_01
+	.word	Z_ERROR_01
 
 ; 0OP:176 0 rtrue
 ; Return true (i.e., 1) from the current routine.

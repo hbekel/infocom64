@@ -366,20 +366,22 @@ L134F:  lda     $03
         jmp     L147F
 
 L135C:  and     #$1F
+	asl
         tay
-        lda     JUMP_TABLE_VAR_LO,y
+        lda     JUMP_TABLE_VAR,y
         sta     L136B+1
-        lda     JUMP_TABLE_VAR_HI,y
+        lda     JUMP_TABLE_VAR+1,y
         sta     L136B+2
 L136B	jsr	$FFFF
         jmp     MAIN_LOOP
 
 Z_EXTENDED_OPCODE:  cmp     #$0B
         bcs     L138D
+	asl
         tay
-        lda     JUMP_TABLE_EXT_LO,y
+        lda     JUMP_TABLE_EXT,y
         sta     L1382+1
-        lda     JUMP_TABLE_EXT_HI,y
+        lda     JUMP_TABLE_EXT+1,y
         sta     L1382+2
 L1382	jsr	$FFFF
         jmp     MAIN_LOOP
@@ -439,10 +441,11 @@ L13DF:  cpx     #$08
 JUMP_ZERO:  cmp     #$BE
         beq     L1408
         and     #$0F
+	asl
         tay
-        lda     JUMP_TABLE_ZERO_LO,y
+        lda     JUMP_TABLE_ZERO,y
         sta     L13FD+1
-        lda     JUMP_TABLE_ZERO_HI,y
+        lda     JUMP_TABLE_ZERO+1,y
         sta     L13FD+2
 L13FD	jsr	$FFFF
         jmp     MAIN_LOOP
@@ -471,10 +474,11 @@ L142A:  jsr     L14C1
         jsr     L149E
 L1430:  lda     $03
         and     #$0F
+	asl
         tay
-        lda     JUMP_TABLE_ONE_LO,y
+        lda     JUMP_TABLE_ONE,y
         sta     L1441+1
-        lda     JUMP_TABLE_ONE_HI,y
+        lda     JUMP_TABLE_ONE+1,y
         sta     L1441+2
 L1441	jsr	$FFFF
         jmp     MAIN_LOOP
@@ -508,10 +512,11 @@ L1472:  jsr     L14C1
 L147D:  inc     $77
 L147F:  lda     $03
         and     #$1F
+	asl
         tay
-        lda     JUMP_TABLE_TWO_LO,y
+        lda     JUMP_TABLE_TWO,y
         sta     L1490+1
-        lda     JUMP_TABLE_TWO_HI,y
+        lda     JUMP_TABLE_TWO+1,y
         sta     L1490+2
 L1490	jsr	$FFFF
         jmp     MAIN_LOOP
@@ -747,242 +752,124 @@ L1624:  lda     Z_HDR_FLAGS2+1
         sta     Z_HDR_FLAGS2+1
         rts
 
-; pair
+; Jump tables
 
-JUMP_TABLE_ZERO_HI
-	.byte	>Z_RTRUE
-	.byte	>Z_RFALSE
-	.byte	>Z_PRINT_LITERAL
-	.byte	>Z_PRINT_RET_LITERAL
-	.byte	>Z_NOP
-	.byte	>Z_ILLEGAL1
-	.byte	>Z_ILLEGAL1
-	.byte	>Z_RESTART
-	.byte	>Z_RET_POPPED
-	.byte	>Z_POP
-	.byte	>Z_QUIT
-	.byte	>Z_NEW_LINE
-	.byte	>Z_ILLEGAL2
-	.byte	>Z_VERIFY
-	.byte	>Z_EXTENDED_OPCODE
-	.byte	>Z_PIRACY
+JUMP_TABLE_ZERO
+	.word	Z_RTRUE
+	.word	Z_RFALSE
+	.word	Z_PRINT_LITERAL
+	.word	Z_PRINT_RET_LITERAL
+	.word	Z_NOP
+	.word	Z_ILLEGAL1
+	.word	Z_ILLEGAL1
+	.word	Z_RESTART
+	.word	Z_RET_POPPED
+	.word	Z_POP
+	.word	Z_QUIT
+	.word	Z_NEW_LINE
+	.word	Z_ILLEGAL2
+	.word	Z_VERIFY
+	.word	Z_EXTENDED_OPCODE
+	.word	Z_PIRACY
 
-JUMP_TABLE_ZERO_LO
-	.byte	<Z_RTRUE
-	.byte	<Z_RFALSE
-	.byte	<Z_PRINT_LITERAL
-	.byte	<Z_PRINT_RET_LITERAL
-	.byte	<Z_NOP
-	.byte	<Z_ILLEGAL1
-	.byte	<Z_ILLEGAL1
-	.byte	<Z_RESTART
-	.byte	<Z_RET_POPPED
-	.byte	<Z_POP
-	.byte	<Z_QUIT
-	.byte	<Z_NEW_LINE
-	.byte	<Z_ILLEGAL2
-	.byte	<Z_VERIFY
-	.byte	<Z_EXTENDED_OPCODE
-	.byte	<Z_PIRACY
+JUMP_TABLE_ONE
+	.word	Z_JZ
+	.word	Z_GET_SIBLING
+	.word	Z_GET_CHILD
+	.word	Z_GET_PARENT
+	.word	Z_GET_PROP_LEN
+	.word	Z_INC
+	.word	Z_DEC
+	.word	Z_PRINT_ADDR
+	.word	Z_CALL
+	.word	Z_REMOVE_OBJ
+	.word	Z_PRINT_OBJ
+	.word	Z_RET
+	.word	Z_JUMP
+	.word	Z_PRINT_PADDR
+	.word	Z_LOAD
+	.word	Z_CALL_LN
 
-JUMP_TABLE_ONE_HI
-	.byte	>Z_JZ
-	.byte	>Z_GET_SIBLING
-	.byte	>Z_GET_CHILD
-	.byte	>Z_GET_PARENT
-	.byte	>Z_GET_PROP_LEN
-	.byte	>Z_INC
-	.byte	>Z_DEC
-	.byte	>Z_PRINT_ADDR
-	.byte	>Z_CALL
-	.byte	>Z_REMOVE_OBJ
-	.byte	>Z_PRINT_OBJ
-	.byte	>Z_RET
-	.byte	>Z_JUMP
-	.byte	>Z_PRINT_PADDR
-	.byte	>Z_LOAD
-	.byte	>Z_CALL_LN
+JUMP_TABLE_TWO
+	.word	Z_ERROR_04
+	.word	Z_JE
+	.word	Z_JL
+	.word	Z_JG
+	.word	Z_DEC_CHK
+	.word	Z_INC_CHK
+	.word	Z_JIN
+	.word	Z_TEST
+	.word	Z_OR
+	.word	Z_AND
+	.word	Z_TEST_ATTR
+	.word	Z_SET_ATTR
+	.word	Z_CLEAR_ATTR
+	.word	Z_STORE
+	.word	Z_INSERT_OBJ
+	.word	Z_LOADW
+	.word	Z_LOADB
+	.word	Z_GET_PROP
+	.word	Z_GET_PROP_ADDR
+	.word	Z_GET_NEXT_PROP
+	.word	Z_ADD
+	.word	Z_SUB
+	.word	Z_MUL
+	.word	Z_DIV
+	.word	Z_MOD
+	.word	Z_CALL
+	.word	Z_CALL_LN
+	.word	Z_SET_COLOR
+	.word	Z_THROW_VALUE
+	.word	Z_ERROR_04
+	.word	Z_ERROR_04
+	.word	Z_ERROR_04
 
-JUMP_TABLE_ONE_LO
-	.byte	<Z_JZ
-	.byte	<Z_GET_SIBLING
-	.byte	<Z_GET_CHILD
-	.byte	<Z_GET_PARENT
-	.byte	<Z_GET_PROP_LEN
-	.byte	<Z_INC
-	.byte	<Z_DEC
-	.byte	<Z_PRINT_ADDR
-	.byte	<Z_CALL
-	.byte	<Z_REMOVE_OBJ
-	.byte	<Z_PRINT_OBJ
-	.byte	<Z_RET
-	.byte	<Z_JUMP
-	.byte	<Z_PRINT_PADDR
-	.byte	<Z_LOAD
-	.byte	<Z_CALL_LN
+JUMP_TABLE_VAR
+	.word	Z_CALL
+	.word	Z_STOREW
+	.word	Z_STOREB
+	.word	Z_PUT_PROP
+	.word	Z_AREAD
+	.word	Z_PRINT_CHAR
+	.word	Z_PRINT_NUM
+	.word	Z_RANDOM
+	.word	Z_PUSH
+	.word	Z_PULL
+	.word	Z_SPLIT_WINDOW
+	.word	Z_SET_WINDOW
+	.word	Z_CALL
+	.word	Z_ERASE_WINDOW
+	.word	Z_ERASE_LINE
+	.word	Z_SET_CURSOR
+	.word	Z_GET_CURSOR
+	.word	Z_SET_TEXT_STYLE
+	.word	Z_BUFFER_MODE
+	.word	Z_OUTPUT_STREAM
+	.word	Z_INPUT_STREAM
+	.word	Z_SOUND_EFFECT
+	.word	Z_READ_CHAR
+	.word	Z_SCAN_TABLE
+	.word	Z_NOT
+	.word	Z_CALL_LN
+	.word	Z_CALL_LN
+	.word	Z_TOKENIZE
+	.word	Z_ENCODE_TEXT
+	.word	Z_COPY_TABLE
+	.word	Z_PRINT_TABLE
+	.word	Z_CHECK_ARG_COUNT
 
-JUMP_TABLE_TWO_HI
-	.byte	>Z_ERROR_04
-	.byte	>Z_JE
-	.byte	>Z_JL
-	.byte	>Z_JG
-	.byte	>Z_DEC_CHK
-	.byte	>Z_INC_CHK
-	.byte	>Z_JIN
-	.byte	>Z_TEST
-	.byte	>Z_OR
-	.byte	>Z_AND
-	.byte	>Z_TEST_ATTR
-	.byte	>Z_SET_ATTR
-	.byte	>Z_CLEAR_ATTR
-	.byte	>Z_STORE
-	.byte	>Z_INSERT_OBJ
-	.byte	>Z_LOADW
-	.byte	>Z_LOADB
-	.byte	>Z_GET_PROP
-	.byte	>Z_GET_PROP_ADDR
-	.byte	>Z_GET_NEXT_PROP
-	.byte	>Z_ADD
-	.byte	>Z_SUB
-	.byte	>Z_MUL
-	.byte	>Z_DIV
-	.byte	>Z_MOD
-	.byte	>Z_CALL
-	.byte	>Z_CALL_LN
-	.byte	>Z_SET_COLOR
-	.byte	>Z_THROW_VALUE
-	.byte	>Z_ERROR_04
-	.byte	>Z_ERROR_04
-	.byte	>Z_ERROR_04
-
-
-JUMP_TABLE_TWO_LO
-	.byte	<Z_ERROR_04
-	.byte	<Z_JE
-	.byte	<Z_JL
-	.byte	<Z_JG
-	.byte	<Z_DEC_CHK
-	.byte	<Z_INC_CHK
-	.byte	<Z_JIN
-	.byte	<Z_TEST
-	.byte	<Z_OR
-	.byte	<Z_AND
-	.byte	<Z_TEST_ATTR
-	.byte	<Z_SET_ATTR
-	.byte	<Z_CLEAR_ATTR
-	.byte	<Z_STORE
-	.byte	<Z_INSERT_OBJ
-	.byte	<Z_LOADW
-	.byte	<Z_LOADB
-	.byte	<Z_GET_PROP
-	.byte	<Z_GET_PROP_ADDR
-	.byte	<Z_GET_NEXT_PROP
-	.byte	<Z_ADD
-	.byte	<Z_SUB
-	.byte	<Z_MUL
-	.byte	<Z_DIV
-	.byte	<Z_MOD
-	.byte	<Z_CALL
-	.byte	<Z_CALL_LN
-	.byte	<Z_SET_COLOR
-	.byte	<Z_THROW_VALUE
-	.byte	<Z_ERROR_04
-	.byte	<Z_ERROR_04
-	.byte	<Z_ERROR_04
-
-JUMP_TABLE_VAR_HI
-	.byte	>Z_CALL
-	.byte	>Z_STOREW
-	.byte	>Z_STOREB
-	.byte	>Z_PUT_PROP
-	.byte	>Z_AREAD
-	.byte	>Z_PRINT_CHAR
-	.byte	>Z_PRINT_NUM
-	.byte	>Z_RANDOM
-	.byte	>Z_PUSH
-	.byte	>Z_PULL
-	.byte	>Z_SPLIT_WINDOW
-	.byte	>Z_SET_WINDOW
-	.byte	>Z_CALL
-	.byte	>Z_ERASE_WINDOW
-	.byte	>Z_ERASE_LINE
-	.byte	>Z_SET_CURSOR
-	.byte	>Z_GET_CURSOR
-	.byte	>Z_SET_TEXT_STYLE
-	.byte	>Z_BUFFER_MODE
-	.byte	>Z_OUTPUT_STREAM
-	.byte	>Z_INPUT_STREAM
-	.byte	>Z_SOUND_EFFECT
-	.byte	>Z_READ_CHAR
-	.byte	>Z_SCAN_TABLE
-	.byte	>Z_NOT
-	.byte	>Z_CALL_LN
-	.byte	>Z_CALL_LN
-	.byte	>Z_TOKENIZE
-	.byte	>Z_ENCODE_TEXT
-	.byte	>Z_COPY_TABLE
-	.byte	>Z_PRINT_TABLE
-	.byte	>Z_CHECK_ARG_COUNT
-
-JUMP_TABLE_VAR_LO
-	.byte	<Z_CALL
-	.byte	<Z_STOREW
-	.byte	<Z_STOREB
-	.byte	<Z_PUT_PROP
-	.byte	<Z_AREAD
-	.byte	<Z_PRINT_CHAR
-	.byte	<Z_PRINT_NUM
-	.byte	<Z_RANDOM
-	.byte	<Z_PUSH
-	.byte	<Z_PULL
-	.byte	<Z_SPLIT_WINDOW
-	.byte	<Z_SET_WINDOW
-	.byte	<Z_CALL
-	.byte	<Z_ERASE_WINDOW
-	.byte	<Z_ERASE_LINE
-	.byte	<Z_SET_CURSOR
-	.byte	<Z_GET_CURSOR
-	.byte	<Z_SET_TEXT_STYLE
-	.byte	<Z_BUFFER_MODE
-	.byte	<Z_OUTPUT_STREAM
-	.byte	<Z_INPUT_STREAM
-	.byte	<Z_SOUND_EFFECT
-	.byte	<Z_READ_CHAR
-	.byte	<Z_SCAN_TABLE
-	.byte	<Z_NOT
-	.byte	<Z_CALL_LN
-	.byte	<Z_CALL_LN
-	.byte	<Z_TOKENIZE
-	.byte	<Z_ENCODE_TEXT
-	.byte	<Z_COPY_TABLE
-	.byte	<Z_PRINT_TABLE
-	.byte	<Z_CHECK_ARG_COUNT
-
-JUMP_TABLE_EXT_HI
-	.byte	>Z_SAVE
-	.byte	>Z_RESTORE
-	.byte	>Z_LOG_SHIFT
-	.byte	>Z_ART_SHIFT
-	.byte	>Z_SET_FONT
-	.byte	>Z_DRAW_PICTURE
-	.byte	>Z_PICTURE_DATA
-	.byte	>Z_DRAW_PICTURE
-	.byte	>Z_SET_MARGINS
-	.byte	>Z_SAVE_RESTORE_UNDO
-	.byte	>Z_SAVE_RESTORE_UNDO
-
-JUMP_TABLE_EXT_LO
-	.byte	<Z_SAVE
-	.byte	<Z_RESTORE
-	.byte	<Z_LOG_SHIFT
-	.byte	<Z_ART_SHIFT
-	.byte	<Z_SET_FONT
-	.byte	<Z_DRAW_PICTURE
-	.byte	<Z_PICTURE_DATA
-	.byte	<Z_DRAW_PICTURE
-	.byte	<Z_SET_MARGINS
-	.byte	<Z_SAVE_RESTORE_UNDO
-	.byte	<Z_SAVE_RESTORE_UNDO
+JUMP_TABLE_EXT
+	.word	Z_SAVE
+	.word	Z_RESTORE
+	.word	Z_LOG_SHIFT
+	.word	Z_ART_SHIFT
+	.word	Z_SET_FONT
+	.word	Z_DRAW_PICTURE
+	.word	Z_PICTURE_DATA
+	.word	Z_DRAW_PICTURE
+	.word	Z_SET_MARGINS
+	.word	Z_SAVE_RESTORE_UNDO
+	.word	Z_SAVE_RESTORE_UNDO
 
 L1708:  lda     $18
         cmp     #$D0
