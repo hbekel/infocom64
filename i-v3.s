@@ -3613,34 +3613,6 @@ L1	cmp     #$0A		; is accumulator less than 10?
 L2	rts
 .)
 
-;
-; This is where my routines start -- CK
-;
-
-SECBUF_TO_PVEC:
-.(
-        sei                             ; if so, turn off kernel for a bit
-        lda     R6510
-        and     #%11111101
-        sta     R6510
-        ldy     #$00
-L1	lda     SECTOR_BUFFER,y
-        sta     (PAGE_VECTOR),y
-        iny
-        bne     L1
-        sei
-        lda     R6510                     ; unilaterally turn kernel back on
-        ora     #%00000010
-        sta     R6510
-        cli
-	inc	PAGE_VECTOR+1
-	inc	STORY_INDEX		; increase all pointers
-	bne	L2
-	inc	STORY_INDEX+1
-L2	rts
-.)
-
-
 ; string area here
 
 POSITION_TEXT:

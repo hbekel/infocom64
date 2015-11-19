@@ -5082,33 +5082,6 @@ FATAL_ERROR_0E:  lda     #$0E
         jmp     FATAL_ERROR
 
 ;
-; This is where my routines start -- CK
-;
-
-SECBUF_TO_PVEC:
-.(
-        sei
-        lda     R6510
-        and     #MAP_RAM
-        sta     R6510
-        ldy     #$00
-L1	lda     SECTOR_BUFFER,y
-        sta     (PAGE_VECTOR),y
-        iny
-        bne     L1
-        sei
-        lda     R6510			; unilaterally turn kernel back on
-        ora     #MAP_ROM
-        sta     R6510
-        cli
-	inc	PAGE_VECTOR+1		; begin CK
-        inc     STORY_INDEX
-        bne     L2
-        inc     STORY_INDEX+1		; end CK
-L2	rts
-.)
-
-;
 ; local status stuff
 ;
 
