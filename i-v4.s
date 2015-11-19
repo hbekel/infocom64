@@ -5113,7 +5113,7 @@ L1	lda     SECTOR_BUFFER,y
         inc     STORY_INDEX+1
 L2	inc     PAGE_VECTOR+1
         lda     PAGE_VECTOR+1
-        cmp     #$D0                    ; are we now stomping on $d000?
+        cmp     #>IO_ADDR		; are we now stomping on $d000?
         bne     L3
         clc
         adc     #$10                    ; yeah, skip it and go on to $e000

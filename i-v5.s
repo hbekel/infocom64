@@ -296,7 +296,7 @@ L12BE:  lda     #$00
         sta     Z_PC+1
         lda     Z_HDR_START_PC+1
         sta     Z_PC
-        jsr     L1797
+        jsr     VIRT_TO_PHYS_ADDR_1
         lda     #$27
         sta     $70
         lda     INTERP_FLAGS
@@ -753,7 +753,7 @@ L1600:  sta     Z_PC
         adc     $10
         and     #$03
         sta     $10
-        jmp     L1797
+        jmp     VIRT_TO_PHYS_ADDR_1
 
 Z_NOP:  rts
 
@@ -933,7 +933,7 @@ L175E:  lda     Z_VECTOR2
         sta     $15
         lda     #$00
         sta     $16
-        jmp     L1777
+        jmp     VIRT_TO_PHYS_ADDR
 
 L176D:  .byte 0
 L176E:  .byte 0
@@ -946,24 +946,32 @@ L1774:  .byte 0
 L1775:  .byte 0
 L1776:  .byte 0
 
-L1777:  lda     $16
+VIRT_TO_PHYS_ADDR
+.(
+	lda     $16
         bne     L1786
         lda     $15
         cmp     Z_BASE_PAGE+1
         bcs     L1786
+
         adc     #>Z_HEADER
         sta     $18
 L1785:  rts
 
-L1786:  lda     $16
+L1786
+	lda     $16
         ldy     $15
-        jsr     L17BB
+        jsr     CALC_NONRESIDENT_PHYS_ADDR
         clc
         adc     MAX_RES_PAGE_CALC
         sta     $18
         lda     L17BA
         beq     L1785
-L1797:  lda     $10
+.)
+
+VIRT_TO_PHYS_ADDR_1
+.(
+	lda     $10
         bne     L17A6
         lda     Z_PC+1
         cmp     Z_BASE_PAGE+1
@@ -974,17 +982,20 @@ L17A5:  rts
 
 L17A6:  lda     $10
         ldy     Z_PC+1
-        jsr     L17BB
+        jsr     CALC_NONRESIDENT_PHYS_ADDR
         clc
         adc     MAX_RES_PAGE_CALC
         sta     $12
         lda     L17BA
         beq     L17A5
-        jmp     L1777
+        jmp     VIRT_TO_PHYS_ADDR
+.)
 
 L17BA:  .byte 0
 
-L17BB:  sta     L176E
+CALC_NONRESIDENT_PHYS_ADDR
+.(	
+	sta     L176E
         sty     L176D
         ldx     #$00
         stx     L17BA
@@ -1006,12 +1017,10 @@ L17BB:  sta     L176E
         dec     L17BA
         pla
         rts
-
 L17EF:  sta     L1770
         cmp     L176F
         bne     L17F8
         rts
-
 L17F8:  ldy     L176F	; 16dc
         lda     $0D00,y
         sta     L1773
@@ -1022,6 +1031,7 @@ L17F8:  ldy     L176F	; 16dc
         jsr     L1865
         lda     L1770
         sta     L176F
+.)
 L1816:  rts
 
 REU_FETCH
@@ -1240,7 +1250,7 @@ L1A14:  pha
         inc     $15
         bne     L1A1B
         inc     $16
-L1A1B:  jsr     L1777
+L1A1B:  jsr     VIRT_TO_PHYS_ADDR
         pla
         rts
 
@@ -1248,7 +1258,7 @@ L1A20:  pha
         inc     Z_PC+1
         bne     L1A27
         inc     $10
-L1A27:  jsr     L1797
+L1A27:  jsr     VIRT_TO_PHYS_ADDR_1
         pla
         rts
 
@@ -1264,7 +1274,7 @@ L1A2C:  lda     Z_VECTOR2
 L1A3B:  asl     $14
         rol     $15
         rol     $16
-        jmp     L1777
+        jmp     VIRT_TO_PHYS_ADDR
 
 L1A44:  rts
 
@@ -1381,7 +1391,7 @@ L1AB7:  sec
         sta     $16
         ldx     #$FF
         stx     $31
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
         jmp     L1A4E
 
 L1B0D:  lda     $31
@@ -1402,7 +1412,7 @@ L1B19:  lda     Z_VECTOR2
         lda     #$00
         rol
         sta     $16
-        jmp     L1777
+        jmp     VIRT_TO_PHYS_ADDR
 
 L1B2B:  lda     $34
         bpl     L1B31
@@ -2085,7 +2095,7 @@ L1F94:  jsr     L14E4
         jsr     L161B
         jmp     L32BE
 
-L1FBC:  jsr     L1797
+L1FBC:  jsr     VIRT_TO_PHYS_ADDR_1
         lda     L32F9
         beq     L1FC5
         rts
@@ -2289,7 +2299,7 @@ L212B:  lda     Z_OPERAND2
         lda     #$00
         adc     #$00
         sta     $16
-        jmp     L1777
+        jmp     VIRT_TO_PHYS_ADDR
 
 Z_GET_PROP   jsr     L1CC3
 L2144:  jsr     L1CE1
@@ -2621,7 +2631,7 @@ L23A1:  ldx     $68
         sta     Z_PC+1
         lda     Z_OPERAND1
         sta     Z_PC
-        jsr     L1797
+        jsr     VIRT_TO_PHYS_ADDR_1
         jsr     FETCH_NEXT_ZBYTE
         sta     Z_VECTOR3
         sta     Z_VECTOR3+1
@@ -2892,7 +2902,7 @@ L25E1:  lda     Z_OPERAND2
         sta     $15
         lda     #$00
         sta     $16
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
 L25F0:  lda     $14
         sta     !$0009
         lda     $15
@@ -2918,7 +2928,7 @@ L2612:  lda     !$0009
         lda     !$000B
         adc     #$00
         sta     $16
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
 L262D:  dec     $7D
         bne     L25F0
         lda     $7E
@@ -2985,7 +2995,7 @@ L26A2:  lda     #$00
         sta     $15
         lda     Z_OPERAND1
         sta     $14
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
         lda     Z_OPERAND2
         sta     Z_VECTOR2
         lda     Z_OPERAND2+1
@@ -3382,7 +3392,7 @@ L2998:  sta     Z_TEMP1
         sty     $14
         lda     #$00
         sta     $16
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
         jsr     FETCH_BYTE_FROM_VECTOR
         sta     Z_VECTOR3
 L29B0:  jsr     FETCH_BYTE_FROM_VECTOR
@@ -3410,14 +3420,14 @@ L29D5:  sta     $15
         sty     $14
         lda     #$00
         sta     $16
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
         jsr     FETCH_BYTE_FROM_VECTOR
         clc
         adc     $14
         sta     $14
         bcc     L29EC
         inc     $15
-L29EC:  jsr     L1777
+L29EC:  jsr     VIRT_TO_PHYS_ADDR
         jsr     FETCH_BYTE_FROM_VECTOR
         sta     $2F
         sta     Z_VECTOR2
@@ -3506,7 +3516,7 @@ L2A88:  lsr     Z_VECTOR3
         sta     $0A
         lda     $16
         sta     $0B
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
         jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32DF
         bcc     L2AD9
@@ -3631,7 +3641,7 @@ L2B8F:  lda     Z_VECTOR3+1
         sta     $15
         lda     #$00
         sta     $16
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
 L2BA5:  dec     $2D
         bne     L2B53
         lda     $2E
@@ -4147,7 +4157,7 @@ Z_PRINT_TABLE   lda     Z_OPERAND1
         sta     $15
         lda     #$00
         sta     $16
-        jsr     L1777
+        jsr     VIRT_TO_PHYS_ADDR
         lda     Z_OPERAND2
         cmp     #$00
         beq     L2FE8
@@ -4562,7 +4572,7 @@ L32BE:  pla
         sta     Z_PC+1
         pla
         sta     Z_PC
-        jsr     L1797
+        jsr     VIRT_TO_PHYS_ADDR_1
         pla
         sta     Z_VECTOR3
         pla
@@ -5379,7 +5389,7 @@ L3DA7:  lda     #$18
         sta     Z_HDR_SCREEN_ROWS
         lda     #$28
         sta     Z_HDR_SCREEN_COLS
-L3DB9:  jsr     L1797
+L3DB9:  jsr     VIRT_TO_PHYS_ADDR_1
         jsr     L1624
         lda     $61
         sta     $5F
