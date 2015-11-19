@@ -763,7 +763,7 @@ L161B:  lda     Z_OPERAND1
         sta     Z_VECTOR1+1
         rts
 
-L1624:  lda     Z_HDR_FLAGS2+1
+REQUEST_STATUS_LINE_REDRAW:  lda     Z_HDR_FLAGS2+1
         ora     #$04
         sta     Z_HDR_FLAGS2+1
         rts
@@ -5158,7 +5158,9 @@ L3B91:  rts
 
 L3B92	.byte	$0d, "Press [RETURN] to continue.", $0d, $0d
 
-Z_SAVE   lda	#$4e
+Z_SAVE
+.(
+	lda	#$4e
         ldx	$77
         beq     L3BDD
         lda     #$50
@@ -5267,8 +5269,10 @@ L3C9C:  lda     $61
         lda     #$01
         ldx     #$00
         jmp     RETURN_VALUE
+.)
 
 Z_RESTORE
+.(
         lda	#$4e
 	ldx	$77
         beq     L3CDE
@@ -5387,10 +5391,10 @@ L3D9F:  lda     $0F26,x
         bpl     L3D9F
 L3DA7:  lda     #$18
         sta     Z_HDR_SCREEN_ROWS
-        lda     #$28
+        lda     #SCREEN_WIDTH
         sta     Z_HDR_SCREEN_COLS
 L3DB9:  jsr     VIRT_TO_PHYS_ADDR_1
-        jsr     L1624
+        jsr     REQUEST_STATUS_LINE_REDRAW
         lda     $61
         sta     $5F
         lda     $60
@@ -5398,6 +5402,7 @@ L3DB9:  jsr     VIRT_TO_PHYS_ADDR_1
         lda     #$02
         ldx     #$00
         jmp     RETURN_VALUE
+.)
 
 Z_ILLEGAL1   rts
 
