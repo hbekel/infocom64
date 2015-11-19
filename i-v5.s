@@ -7,6 +7,9 @@
 
 #include "c64.inc"
 
+MAP_RAM =		%11111101	; note - v4 didn't map $D000 as RAM
+MAP_ROM =		%00000010
+
 REU_PRESENT =		$02
 
 Z_VECTOR1 =		$04
@@ -884,51 +887,40 @@ JUMP_TABLE_EXT
 	.word	Z_SAVE_RESTORE_UNDO
 	.word	Z_SAVE_RESTORE_UNDO
 
-L1708:  lda     $18
-        cmp     #$D0
-        bcc     L1726
+FETCH_BYTE_FROM_VECTOR
         sei
         lda     R6510
-        and     #%11111101
+        and     #MAP_RAM
         sta     R6510
         ldy     $14
         lda     ($17),y
         tax
         sei
         lda     R6510
-        ora     #%00000010
+        ora     #MAP_ROM
         sta     R6510
         cli
         txa
-        jmp     L172A
-
-L1726:  ldy     $14
-        lda     ($17),y
 L172A:  inc     $14
         bne     L1731
         jsr     L1A14
 L1731:  tay
         rts
 
-FETCH_NEXT_ZBYTE:  lda     $12
-        cmp     #$D0
-        bcc     L1751
+FETCH_NEXT_ZBYTE
         sei
         lda     R6510
-        and     #$FD
+        and     #MAP_RAM
         sta     R6510
         ldy     Z_PC
         lda     ($11),y
         tax
         sei
         lda     R6510
-        ora     #$02
+        ora     #MAP_ROM
         sta     R6510
         cli
         txa
-        jmp     L1755
-L1751:  ldy     Z_PC
-        lda     ($11),y
 L1755:  inc     Z_PC
         bne     L175C
         jsr     L1A20
@@ -1419,9 +1411,9 @@ L1B2B:  lda     $34
 
 L1B31:  bne     L1B46
         inc     $34
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         sta     $36
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         sta     $35
         lda     $36
         lsr
@@ -2276,9 +2268,9 @@ Z_INSERT_OBJ   jsr     Z_REMOVE_OBJ
 L210F:  rts
 
 Z_LOADW   jsr     L2127
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
 L2116:  sta     Z_VECTOR1+1
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         sta     Z_VECTOR1
         jmp     RETURN_NULL
 
@@ -2907,12 +2899,12 @@ L25F0:  lda     $14
         sta     !$000A
         lda     $16
         sta     !$000B
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     Z_OPERAND1+1
         bne     L2612
         lda     L3302
         beq     L2645
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     Z_OPERAND1
         beq     L2645
 L2612:  lda     !$0009
@@ -3006,7 +2998,7 @@ L26A2:  lda     #$00
         sta     Z_VECTOR3+1
 L26C4:  jsr     DEC_PAGE_COUNT
         bcc     L26D9
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         ldy     #$00
         sta     (Z_VECTOR2),y
         inc     Z_VECTOR2
@@ -3391,9 +3383,9 @@ L2998:  sta     Z_TEMP1
         lda     #$00
         sta     $16
         jsr     L1777
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         sta     Z_VECTOR3
-L29B0:  jsr     L1708
+L29B0:  jsr     FETCH_BYTE_FROM_VECTOR
         cmp     Z_TEMP1
         beq     L29BF
         dec     Z_VECTOR3
@@ -3419,22 +3411,22 @@ L29D5:  sta     $15
         lda     #$00
         sta     $16
         jsr     L1777
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         clc
         adc     $14
         sta     $14
         bcc     L29EC
         inc     $15
 L29EC:  jsr     L1777
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         sta     $2F
         sta     Z_VECTOR2
         lda     #$00
         sta     Z_VECTOR2+1
         sta     Z_VECTOR3
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         sta     $2E
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         sta     $2D
         lda     $2E
         bpl     L2A0D
@@ -3515,27 +3507,27 @@ L2A88:  lsr     Z_VECTOR3
         lda     $16
         sta     $0B
         jsr     L1777
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32DF
         bcc     L2AD9
         bne     L2B0D
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E0
         bcc     L2AD9
         bne     L2B0D
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E1
         bcc     L2AD9
         bne     L2B0D
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E2
         bcc     L2AD9
         bne     L2B0D
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E3
         bcc     L2AD9
         bne     L2B0D
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E4
         beq     L2B38
         bcs     L2B0D
@@ -3611,22 +3603,22 @@ L2B53:  lda     $14
         sta     $0A
         lda     $16
         sta     $0B
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32DF
         bne     L2B8F
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E0
         bne     L2B8F
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E1
         bne     L2B8F
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E2
         bne     L2B8F
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E3
         bne     L2B8F
-        jsr     L1708
+        jsr     FETCH_BYTE_FROM_VECTOR
         cmp     L32E4
         beq     L2B38
 L2B8F:  lda     Z_VECTOR3+1
@@ -4173,7 +4165,7 @@ L2FB4:  sta     $0A
 L2FBD:  jsr     L349E
         stx     L32FE
         sty     L32FF
-L2FC6:  jsr     L1708
+L2FC6:  jsr     FETCH_BYTE_FROM_VECTOR
         jsr     L2C49
         dec     Z_VECTOR3
         bne     L2FC6
@@ -5412,7 +5404,7 @@ SECBUF_TO_PVEC
 .(
 	sei
         lda     R6510
-        and     #%11111101
+        and     #MAP_RAM	; including RAM underneath $D000
         sta     R6510
 	ldy     #$00
 L1	lda     SECTOR_BUFFER,y
@@ -5421,7 +5413,7 @@ L1	lda     SECTOR_BUFFER,y
         bne     L1
         sei
 	lda     R6510		;  unilaterally turn kernel back on
-        ora     #%00000010
+        ora     #MAP_ROM
         sta     R6510
         cli
 	inc     PAGE_VECTOR+1

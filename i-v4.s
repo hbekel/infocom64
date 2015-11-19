@@ -2648,9 +2648,6 @@ L20AC:  lda     Z_VECTOR3+1
 ; grab #$ff bytes from from ($(17)+$14)
 
 FETCH_BYTE_FROM_VECTOR:
-;	lda     Z_CURRENT_PHYS_PC_ALT+1
-;        cmp     #$E0
-;        bcc     L20C2
         sei
         lda     R6510
         and     #MAP_RAM
@@ -2672,9 +2669,6 @@ L20D7:  tay
 
 FETCH_NEXT_ZBYTE:
 .(
-;	lda     Z_CURRENT_PHYS_PC+1
-;        cmp     #$E0			; under KERNAL?
-;        bcc     L1
         sei
         lda     R6510
         and     #MAP_RAM
