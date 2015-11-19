@@ -687,11 +687,14 @@ L1411:  dec     Z_STACK_POINTER
         ora     Z_STACK_POINTER+1
         beq     Z_ERROR_05
         bne     PUSH_VECTOR1_TO_STACK
-L141B:  lda     #$00
+
+; this CK 2319
+
+RETURN_ZERO:  lda     #$00
         ldx     #$00
 L141F:  sta     Z_VECTOR1
         stx     Z_VECTOR1+1
-L1423:  jsr     FETCH_NEXT_ZBYTE
+RETURN_VALUE:  jsr     FETCH_NEXT_ZBYTE
         beq     PUSH_VECTOR1_TO_STACK
 L1428:  cmp     #$10
         bcs     SET_GLOBAL_WORD
@@ -1335,7 +1338,7 @@ L17BD:  jsr     Z_POP
         sta     Z_SOMETHING_NOT_PC
         jsr     VIRT_TO_PHYS_ADDR_1
         jsr     L14DE
-L17D6	jmp	L1423
+L17D6	jmp	RETURN_VALUE
 
 ; 1OP:140 C jump ?(label)
 ; Jump (unconditionally) to the given label. (This is not a branch instruction
@@ -1359,7 +1362,7 @@ Z_PRINT_PADDR   lda     Z_OPERAND1
 
 Z_LOAD   lda     Z_OPERAND1
         jsr     L137B
-        jmp     L1423
+        jmp     RETURN_VALUE
 
 ; 1OP:143 F 1/4 not value -> (result)
 ; Bitwise NOT (i.e., all 16 bits reversed).
@@ -1371,7 +1374,7 @@ Z_NOT   lda     Z_OPERAND1
         eor     #$FF
 L17FE:  stx     Z_VECTOR1
         sta     Z_VECTOR1+1
-        jmp     L1423
+        jmp     RETURN_VALUE
 
 ; 2OP:2 2 jl a b ?(label)
 ; Jump if a < b (using a signed 16-bit comparison).
@@ -1578,7 +1581,7 @@ Z_LOADW
 L192D:  sta     Z_VECTOR1+1
         jsr     FETCH_BYTE_FROM_VECTOR
         sta     Z_VECTOR1
-        jmp     L1423
+        jmp     RETURN_VALUE
 
 ; 2OP:16 10 loadb array byte-index -> (result)
 ; Stores array->byte-index (i.e., the byte at address array+byte-index,
@@ -1625,7 +1628,7 @@ L196A:  lda     Z_OPERAND2
         iny
         lda     (Z_OBJECTS_ADDR),y
         sta     Z_VECTOR1
-        jmp     L1423
+        jmp     RETURN_VALUE
 L197D:  jsr     L271C
         iny
         cmp     #$01
@@ -1643,7 +1646,7 @@ L1994:  lda     (Z_VECTOR2),y
         lda     (Z_VECTOR2),y
 L199A:  sta     Z_VECTOR1
         stx     Z_VECTOR1+1
-        jmp     L1423
+        jmp     RETURN_VALUE
 
 ; 2OP:18 12 get_prop_addr object property -> (result)
 ; Get the byte address (in dynamic memory) of the property data for the given
@@ -1725,9 +1728,9 @@ L14	iny
         sec
         sbc    Z_BASE_PAGE		; reufix
         sta     Z_VECTOR1+1
-        jmp     L1423
+        jmp     RETURN_VALUE
 .)
-L1A2D:  jmp     L141B
+L1A2D:  jmp     RETURN_ZERO
 
 ; 2OP:19 13 get_next_prop object property -> (result)
 ; Gives the number of the next property provided by the quoted object. This
@@ -2156,7 +2159,7 @@ Z_RANDOM
         bne     L1
         sta     $61
         sta     $62
-        jmp     L141B
+        jmp     RETURN_ZERO
 L1	lda     $61
         ora     $62
         bne     L3
@@ -2188,7 +2191,7 @@ L2	lda     Z_OPERAND1
         lda     L2CA8
         adc     #$00
         sta     Z_VECTOR1+1
-        jmp     L1423
+        jmp     RETURN_VALUE
 L3	lda     $62
         cmp     Z_OPERAND1+1
         bcc     L5
@@ -2218,7 +2221,7 @@ L7	lda     $44
         inc     $44
         bne     L8
         inc     Z_CURRENT_WINDOW
-L8	jmp     L1423
+L8	jmp     RETURN_VALUE
 .)
 
 ; VAR:232 8 push value
@@ -2270,12 +2273,12 @@ L1DE7:  sec
 L1DF2:  sta     Z_VECTOR1
         lda     $15
         sta     Z_VECTOR1+1
-        jsr     L1423
+        jsr     RETURN_VALUE
         jmp     L1468
-L1DFE:  lda     #$00
+L1DFE:  lda     #$00		; shouldn't this be RETURN_ZERO?
         sta     Z_VECTOR1
         sta     Z_VECTOR1+1
-        jsr     L1423
+        jsr     RETURN_VALUE
         jmp     L145C
 
 ; VAR:228 4 1 sread text parse
@@ -4096,7 +4099,7 @@ L2B4F:  rts
 Z_READ_CHAR:        lda     Z_OPERAND1
         cmp     #$01
         beq     L2B59
-        jmp     L141B
+        jmp     RETURN_ZERO
 
 L2B59:  ldx     #$00
         stx     $4F
@@ -4123,7 +4126,7 @@ L2B6E:  lda     Z_OPERAND2
 L2B84:  jsr     GET_KEY_RETRY
         jsr     L2BB5
         bcc     L2B92
-        jmp     L141B
+        jmp     RETURN_ZERO
 
 L2B8F:  jsr     GET_KEY
 L2B92:  ldx     #$05
@@ -4136,7 +4139,7 @@ L2B9E:  lda     L2BAF,x
 L2BA1:  ldx     #$00
         jmp     L141F
 
-        jmp     L141B
+        jmp     RETURN_ZERO
 
 L2BA9:  .byte   $14, $11, $1d, $91, $5e, $9d
 L2BAF:  .byte	$08, $0d, $07, $0e, $0e, $0b
@@ -4885,7 +4888,7 @@ Z_SAVE
 L1
 	jsr	CLOSE_SAVE_FILE
         jsr     REQUEST_STATUS_LINE_REDRAW
-        jmp     L141B
+        jmp     RETURN_ZERO
 
 L2	ldx     #<SAVING_POSITION_TEXT
         lda     #>SAVING_POSITION_TEXT
@@ -5009,7 +5012,7 @@ L35E1
         jsr     STORY_OPEN
 L35E1a
         jsr	REQUEST_STATUS_LINE_REDRAW
-        jmp     L141B
+        jmp     RETURN_ZERO
 
 L35EA:  lda     Z_HDR_FLAGS2		; 330e
         sta     Z_VECTOR2
