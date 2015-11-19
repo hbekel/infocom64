@@ -3954,14 +3954,20 @@ Z_SET_TEXT_STYLE
         beq     L1	; supports pictures and emphasis? no, return
         ldx     Z_OPERAND1
         bne     L2
-        lda     #$92	; reverse off
-        jsr     L4
+        lda     #$92		; reverse off
+        jsr     CHROUT
+	lda	#$05		; CK
+	jsr	CHROUT		; CK
         lda     #$82 	; underline off (on C128/80c)
         jmp     L4
 L1	rts
 L2	cpx     #$01	; reverse?
         bne     L3
-        lda     #$12	; reverse PETSCII
+	lda	Z_CURRENT_WINDOW
+	beq	L2a
+	lda     #$90	; reverse PETSCII
+	jsr	CHROUT
+L2a	lda	#$12
         jmp     L4
 L3	cpx     #$04	; italic?
         bne     L1
@@ -4558,8 +4564,8 @@ Z_SPLIT_WINDOW:
         cpx     #24		; one big screen?
         bcs     L2F9E		; we don't support that, rts
         lda     $52
-        sta     Z_VECTOR2
-        stx     $52
+        sta     Z_VECTOR2	; we need to check for split_window 1
+        stx     $52		; and return stuff back to normal
         stx     $53
         cpx     $4F
         bcc     L2F7B
@@ -4567,7 +4573,8 @@ L2F7B:  lda     #$17
         sec
         sbc     $52
         sta     Z_CURRENT_WINDOW_HEIGHT
-        sec
+	
+L2F7Ba  sec
         jsr     PLOT
         cpx     Z_VECTOR2
         bcc     L2F96
@@ -4608,9 +4615,11 @@ Z_SET_WINDOW:
         lda     #$00
         sta     Z_CURRENT_WINDOW
 				; CK mod - switch to color white
-	lda	#05
-	jsr	CHROUT
-				; end CK mod
+	lda	#$05		; CK
+	jsr	CHROUT		; CK
+	lda	#$92		; CK
+	jsr	CHROUT		; CK
+
 L2FC9:  jsr     L2F7B
         ldx     $77
         ldy     $78
@@ -4621,6 +4630,8 @@ L2FD3:  cmp     #1		; this is window 1
         sta     Z_CURRENT_WINDOW		; window 1 (status line)
 				; CK mod - switch to color black
 	lda	#$90
+	jsr	CHROUT
+	lda	#$12
 	jsr	CHROUT
 				; end CK mod
         lda     #$00
