@@ -3874,8 +3874,8 @@ Z_SET_CURSOR
 	lda	WHICH_GAME
 	cmp	#2	; Trinity
 	bne	L1b
-	cpx	#0	; status line?
-	bne	L1a
+	lda	Z_CURRENT_WINDOW	; if 0, status line
+	beq	L1a
 	cpy	#20
 	bcc	L1a
 	tya
@@ -4616,7 +4616,7 @@ L2FC9:  jsr     L2F7B
         ldy     $78
         jmp     L2FED
 
-L2FD3:  cmp     #1
+L2FD3:  cmp     #1		; this is window 1
         bne     L2F9E		; we handle only windows 0 and 1 :)
         sta     Z_CURRENT_WINDOW		; window 1 (status line)
 				; CK mod - switch to color black
