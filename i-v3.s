@@ -27,6 +27,9 @@
 
 #include "c64.inc"
 
+MAP_RAM =               %11111101
+MAP_ROM =               %00000010
+
 REU_PRESENT =		$02	; 0 (0000) = no REU (death mode)
 				; 1 (x001) = CBM REU
 				; 2 (x010) = GeoRAM
