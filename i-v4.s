@@ -1372,7 +1372,7 @@ Z_NOT   lda     Z_OPERAND1
         tax
         lda     Z_OPERAND1+1
         eor     #$FF
-L17FE:  stx     Z_VECTOR1
+RETURN_VECTOR1:  stx     Z_VECTOR1
         sta     Z_VECTOR1+1
         jmp     RETURN_VALUE
 
@@ -1466,7 +1466,7 @@ Z_OR    lda     Z_OPERAND1
         tax
         lda     Z_OPERAND1+1
         ora     Z_OPERAND2+1
-        jmp     L17FE
+        jmp     RETURN_VECTOR1
 
 ; 2OP:9 9 and a b -> (result)
 ; Bitwise AND.
@@ -1476,7 +1476,7 @@ Z_AND   lda     Z_OPERAND1
         tax
         lda     Z_OPERAND1+1
         and     Z_OPERAND2+1
-        jmp     L17FE
+        jmp     RETURN_VECTOR1
 
 ; 2OP:10 A test_attr object attribute ?(label)
 ; Jump if object has attribute.
@@ -1764,7 +1764,7 @@ Z_ADD   lda     Z_OPERAND1
         tax
         lda     Z_OPERAND1+1
         adc     Z_OPERAND2+1
-        jmp     L17FE
+        jmp     RETURN_VECTOR1
 
 ; 2OP:21 15 sub a b -> (result)
 ; Signed 16-bit subtraction.
@@ -1775,7 +1775,7 @@ Z_SUB   lda     Z_OPERAND1
         tax
         lda     Z_OPERAND1+1
         sbc     Z_OPERAND2+1
-        jmp     L17FE
+        jmp     RETURN_VECTOR1
 
 ; 2OP:22 16 mul a b -> (result)
 ; Signed 16-bit multiplication.
@@ -1797,7 +1797,7 @@ L1A8B:  dex
         bpl     L1A6E
         ldx     Z_OPERAND2
         lda     Z_OPERAND2+1
-        jmp     L17FE
+        jmp     RETURN_VECTOR1
 
 ; 2OP:23 17 div a b -> (result)
 ; Signed 16-bit division. Division by zero should halt the interpreter with a
@@ -1806,7 +1806,7 @@ L1A8B:  dex
 Z_DIV   jsr     L1AAD
         ldx     L2CA5
         lda     L2CA6
-        jmp     L17FE
+        jmp     RETURN_VECTOR1
 
 ; 2OP:24 18 mod a b -> (result)
 ; Remainder after signed 16-bit division. Division by zero should halt the
@@ -1815,7 +1815,7 @@ Z_DIV   jsr     L1AAD
 Z_MOD   jsr     L1AAD
         ldx     L2CA7
         lda     L2CA8
-        jmp     L17FE
+        jmp     RETURN_VECTOR1
 
 L1AAD:  lda     Z_OPERAND1+1
         sta     L2CAC

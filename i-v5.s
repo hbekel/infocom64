@@ -22,6 +22,7 @@ Z_CURRENT_WINDOW =	$48
 Z_TEMP1 =		$54
 Z_STACK_POINTER =	$66
 Z_OPERAND1 =		$79
+Z_OPERAND2 =		$7b
 
 INPUT_BUFFER            = $0200
 Z_STACK_LO              = $0900
@@ -501,16 +502,16 @@ L145C:  jsr     L14C1
 L1462:  lda     $03
         and     #$20
         bne     L1472
-        sta     $7C
+        sta     Z_OPERAND2+1
         jsr     FETCH_NEXT_ZBYTE
-        sta     $7B
+        sta     Z_OPERAND2
         jmp     L147D
 
 L1472:  jsr     L14C1
         lda     Z_VECTOR1
-        sta     $7B
+        sta     Z_OPERAND2
         lda     Z_VECTOR1+1
-        sta     $7C
+        sta     Z_OPERAND2+1
 L147D:  inc     $77
 L147F:  lda     $03
         and     #$1F
@@ -1694,7 +1695,7 @@ L1D1D:  ldy     #$00
 L1D20:  lda     Z_OPERAND1
         ldx     Z_OPERAND1+1
         jsr     L1C8F
-        lda     $7B
+        lda     Z_OPERAND2
         cmp     #$10
 L1D2B:  bcc     L1D51
         sbc     #$10
@@ -2114,7 +2115,7 @@ Z_LOAD   lda     Z_OPERAND1
         jsr     L14B8
         jmp     RETURN_NULL
 
-L1FE7:  stx     Z_VECTOR1
+RETURN_VECTOR1:  stx     Z_VECTOR1
         sta     Z_VECTOR1+1
         jmp     RETURN_NULL
 
@@ -2122,9 +2123,9 @@ Z_JL   jsr     L161B
         jmp     L1FF7
 
 Z_DEC_CHK   jsr     Z_DEC
-L1FF7:  lda     $7B
+L1FF7:  lda     Z_OPERAND2
         sta     Z_VECTOR2
-        lda     $7C
+        lda     Z_OPERAND2+1
         sta     Z_VECTOR2+1
         jmp     L2020
 
@@ -2139,9 +2140,9 @@ Z_INC_CHK   jsr     Z_INC
         sta     Z_VECTOR2
         lda     Z_VECTOR1+1
         sta     Z_VECTOR2+1
-L2018:  lda     $7B
+L2018:  lda     Z_OPERAND2
         sta     Z_VECTOR1
-        lda     $7C
+        lda     Z_OPERAND2+1
         sta	Z_VECTOR1+1
 L2020:  lda     Z_VECTOR2+1
         eor     Z_VECTOR1+1
@@ -2164,37 +2165,37 @@ Z_JIN   lda     Z_OPERAND1
         jsr     L1C8F
         ldy     #$06
         lda     (Z_VECTOR2),y
-        cmp     $7C
+        cmp     Z_OPERAND2+1
         bne	L2054
         iny
         lda     (Z_VECTOR2),y
-        cmp     $7B
+        cmp     Z_OPERAND2
         beq     L2067
 L2054:  jmp     L1599
 
-Z_TEST   lda     $7B
+Z_TEST   lda     Z_OPERAND2
         and     Z_OPERAND1
-        cmp     $7B
+        cmp     Z_OPERAND2
 L205D:  bne     L2054
-        lda     $7C
+        lda     Z_OPERAND2+1
 L2061:  and     Z_OPERAND1+1
-        cmp     $7C
+        cmp     Z_OPERAND2+1
         bne     L2054
 L2067:  jmp     L15A5
 
 Z_OR   lda     Z_OPERAND1
-L206C:  ora     $7B
+L206C:  ora     Z_OPERAND2
         tax
         lda     Z_OPERAND1+1
-        ora     $7C
-        jmp	L1FE7
+        ora     Z_OPERAND2+1
+        jmp	RETURN_VECTOR1
 
 Z_AND   lda     Z_OPERAND1
-        and     $7B
+        and     Z_OPERAND2
         tax
         lda     Z_OPERAND1+1
-        and     $7C
-        jmp     L1FE7
+        and     Z_OPERAND2+1
+        jmp     RETURN_VECTOR1
 
 Z_TEST_ATTR   jsr     L1D20
         lda     $0B
@@ -2230,9 +2231,9 @@ Z_CLEAR_ATTR   jsr     L1D20
         sta     (Z_VECTOR2),y
         rts
 
-Z_STORE   lda     $7B
+Z_STORE   lda     Z_OPERAND2
         sta     Z_VECTOR1
-        lda     $7C
+        lda     Z_OPERAND2+1
         sta     Z_VECTOR1+1
         lda     Z_OPERAND1
         jmp     SET_GLOBAL_OR_LOCAL_WORD
@@ -2245,11 +2246,11 @@ Z_INSERT_OBJ   jsr     Z_REMOVE_OBJ
         sta     Z_VECTOR3
         lda     Z_VECTOR2+1
         sta     Z_VECTOR3+1
-        lda     $7C
+        lda     Z_OPERAND2+1
         ldy     #$06
         sta     (Z_VECTOR2),y
         tax
-        lda     $7B
+        lda     Z_OPERAND2
         iny
         sta     (Z_VECTOR2),y
         jsr     L1C8F
@@ -2284,13 +2285,13 @@ L2116:  sta     Z_VECTOR1+1
 Z_LOADB   jsr     L212B
         lda     #$00
         beq     L2116
-L2127:  asl     $7B
-        rol     $7C
-L212B:  lda     $7B
+L2127:  asl     Z_OPERAND2
+        rol     Z_OPERAND2+1
+L212B:  lda     Z_OPERAND2
         clc
         adc     Z_OPERAND1
         sta     $14
-        lda     $7C
+        lda     Z_OPERAND2+1
         adc     Z_OPERAND1+1
         sta     $15
         lda     #$00
@@ -2300,13 +2301,13 @@ L212B:  lda     $7B
 
 Z_GET_PROP   jsr     L1CC3
 L2144:  jsr     L1CE1
-        cmp     $7B
+        cmp     Z_OPERAND2
         beq     L2166
         bcc     L2153
         jsr     L1D10
         jmp     L2144
 
-L2153:  lda     $7B
+L2153:  lda     Z_OPERAND2
         sec
         sbc     #$01
         asl
@@ -2357,7 +2358,7 @@ Z_GET_PROP_ADDR   lda     Z_OPERAND1
         iny
 L21A7:  lda     (Z_VECTOR2),y
         and     #$3F
-        cmp     $7B
+        cmp     Z_OPERAND2
         beq     L21E8
         bcs     L21B4
         jmp     L2216
@@ -2423,10 +2424,10 @@ L2203:  iny
 L2216:  jmp     RETURN_ZERO
 
 Z_GET_NEXT_PROP   jsr     L1CC3
-        lda     $7B
+        lda     Z_OPERAND2
         beq     L2232
 L2220:  jsr     L1CE1
-        cmp     $7B
+        cmp     Z_OPERAND2
         beq     L222F
         bcc     L2216
         jsr     L1D10
@@ -2439,25 +2440,25 @@ L2232:  jsr     L1CE1
 
 Z_ADD   lda     Z_OPERAND1
         clc
-        adc     $7B
+        adc     Z_OPERAND2
         tax
         lda     Z_OPERAND1+1
-        adc     $7C
-        jmp     L1FE7
+        adc     Z_OPERAND2+1
+        jmp     RETURN_VECTOR1
 
 Z_SUB   lda     Z_OPERAND1
         sec
-        sbc     $7B
+        sbc     Z_OPERAND2
         tax
         lda     Z_OPERAND1+1
-        sbc     $7C
-        jmp     L1FE7
+        sbc     Z_OPERAND2+1
+        jmp     RETURN_VECTOR1
 
 Z_MUL   jsr     L233A
 L2257:  ror     L32ED
         ror     L32EC
-        ror     $7C
-        ror     $7B
+        ror     Z_OPERAND2+1
+        ror     Z_OPERAND2
         bcc     L2274
         lda     Z_OPERAND1
         clc
@@ -2468,34 +2469,34 @@ L2257:  ror     L32ED
         sta     L32ED
 L2274:  dex
         bpl     L2257
-        ldx     $7B
-        lda     $7C
-        jmp     L1FE7
+        ldx     Z_OPERAND2
+        lda     Z_OPERAND2+1
+        jmp     RETURN_VECTOR1
 
-Z_DIV   jsr     L2296
-        ldx     L32E8
-        lda     L32E9
-        jmp     L1FE7
+Z_DIV   jsr     DO_MATH_DIV
+        ldx     MATH_SCRATCH1
+        lda     MATH_SCRATCH1+1
+        jmp     RETURN_VECTOR1
 
-Z_MOD   jsr     L2296
-        ldx     L32EA
-        lda     L32EB
-        jmp     L1FE7
+Z_MOD   jsr     DO_MATH_DIV
+        ldx     MATH_SCRATCH2
+        lda     MATH_SCRATCH2+1
+        jmp     RETURN_VECTOR1
 
-L2296:  lda     Z_OPERAND1+1
+DO_MATH_DIV:  lda     Z_OPERAND1+1
         sta     L32EF
-        eor     $7C
+        eor     Z_OPERAND2+1
         sta     L32EE
         lda     Z_OPERAND1
-        sta     L32E8
+        sta     MATH_SCRATCH1
         lda     Z_OPERAND1+1
-        sta     L32E9
+        sta     MATH_SCRATCH1+1
         bpl     L22AF
         jsr     L22E0
-L22AF:  lda     $7B
-        sta     L32EA
-        lda     $7C
-        sta     L32EB
+L22AF:  lda     Z_OPERAND2
+        sta     MATH_SCRATCH2
+        lda     Z_OPERAND2+1
+        sta     MATH_SCRATCH2+1
         bpl     L22BE
         jsr     L22CE
 L22BE:  jsr     L22F2
@@ -2506,47 +2507,47 @@ L22C9:  lda     L32EF
         bpl     L22DF
 L22CE:  lda     #$00
         sec
-        sbc     L32EA
-        sta     L32EA
+        sbc     MATH_SCRATCH2
+        sta     MATH_SCRATCH2
         lda     #$00
-        sbc     L32EB
-        sta     L32EB
+        sbc     MATH_SCRATCH2+1
+        sta     MATH_SCRATCH2+1
 L22DF:  rts
 
 L22E0:  lda     #$00
         sec
-        sbc     L32E8
-        sta     L32E8
+        sbc     MATH_SCRATCH1
+        sta     MATH_SCRATCH1
         lda     #$00
-        sbc     L32E9
-        sta     L32E9
+        sbc     MATH_SCRATCH1+1
+        sta     MATH_SCRATCH1+1
         rts
 
-L22F2:  lda     L32EA
-        ora     L32EB
+L22F2:  lda     MATH_SCRATCH2
+        ora     MATH_SCRATCH2+1
         beq     L2335
         jsr     L233A
-L22FD:  rol     L32E8
-        rol     L32E9
+L22FD:  rol     MATH_SCRATCH1
+        rol     MATH_SCRATCH1+1
         rol     L32EC
         rol     L32ED
         lda     L32EC
         sec
-        sbc     L32EA
+        sbc     MATH_SCRATCH2
         tay
         lda     L32ED
-        sbc     L32EB
+        sbc     MATH_SCRATCH2+1
         bcc     L231F
         sty     L32EC
         sta	L32ED
 L231F:  dex
         bne     L22FD
-        rol     L32E8
-        rol     L32E9
+        rol     MATH_SCRATCH1
+        rol     MATH_SCRATCH1+1
         lda     L32EC
-        sta     L32EA
+        sta     MATH_SCRATCH2
         lda     L32ED
-        sta     L32EB
+        sta     MATH_SCRATCH2+1
         rts
 
 L2335:  lda     #$08
@@ -2559,9 +2560,9 @@ L233A:  ldx     #$10
         clc
         rts
 
-Z_THROW_VALUE   lda     $7B
+Z_THROW_VALUE   lda     Z_OPERAND2
         sta     $68
-        lda     $7C
+        lda     Z_OPERAND2+1
         sta     $69
         jmp     Z_RET
 
@@ -2572,9 +2573,9 @@ Z_JE   dec     $77
 
 L235A:  lda     Z_OPERAND1
         ldx     Z_OPERAND1+1
-        cmp     $7B
+        cmp     Z_OPERAND2
         bne     L2366
-        cpx     $7C
+        cpx     Z_OPERAND2+1
         beq     L237E
 L2366:  dec     $77
         beq     L2381
@@ -2654,9 +2655,9 @@ L23FB:  lda     L3303
         lda     $77
         sta     L3303
         beq     L2468
-        lda     $7B
+        lda     Z_OPERAND2
         sta     Z_LOCAL_VARIABLES
-        lda     $7C
+        lda     Z_OPERAND2+1
         sta     Z_LOCAL_VARIABLES+1
         dec     $77
         beq     L2468
@@ -2703,8 +2704,8 @@ L2468:  ldx     Z_VECTOR3+1
         sta     $68
         rts
 
-Z_STOREW   asl     $7B
-        rol     $7C
+Z_STOREW   asl     Z_OPERAND2
+        rol     Z_OPERAND2+1
         jsr     L248D
         lda     $7E
         sta     (Z_VECTOR2),y
@@ -2715,11 +2716,11 @@ L2488:  lda     $7D
         sta     (Z_VECTOR2),y
         rts
 
-L248D:  lda     $7B
+L248D:  lda     Z_OPERAND2
         clc
         adc     Z_OPERAND1
         sta     Z_VECTOR2
-        lda     $7C
+        lda     Z_OPERAND2+1
         adc     Z_OPERAND1+1
         clc
         adc     Z_BASE_PAGE
@@ -2729,7 +2730,7 @@ L248D:  lda     $7B
 
 Z_PUT_PROP   jsr     L1CC3
 L24A3:  jsr     L1CE1
-        cmp     $7B
+        cmp     Z_OPERAND2
         beq     L24B2
         bcc     L24C8
         jsr     L1D10
@@ -2758,25 +2759,25 @@ Z_PRINT_CHAR   lda     Z_OPERAND1
         jmp     L2C49
 
 Z_PRINT_NUM   lda     Z_OPERAND1
-        sta     L32E8
+        sta     MATH_SCRATCH1
         lda     Z_OPERAND1+1
-        sta     L32E9
-        lda     L32E9
+        sta     MATH_SCRATCH1+1
+        lda     MATH_SCRATCH1+1
         bpl     L24EE
         lda     #$2D
         jsr     L2C49
         jsr     L22E0
 L24EE:  lda     #$00
         sta     L32F0
-L24F3:  lda     L32E8
-        ora     L32E9
+L24F3:  lda     MATH_SCRATCH1
+        ora     MATH_SCRATCH1+1
         beq     L2511
         lda     #$0A
-        sta     L32EA
+        sta     MATH_SCRATCH2
         lda     #$00
-        sta     L32EB
+        sta     MATH_SCRATCH2+1
         jsr     L22F2
-        lda     L32EA
+        lda     MATH_SCRATCH2
         pha
         inc     L32F0
         bne     L24F3
@@ -2805,49 +2806,50 @@ Z_RANDOM
 .(
 	lda     Z_OPERAND1
         ora     Z_OPERAND1+1
-        bne     L2537
-        sta     L32F7
-        sta     L32F8
+        bne     DO_RAND
+        sta     RAND_SEED	; zero, so reseed random generator
+        sta     RAND_SEED+1	; (this isn't random at all)
         jmp     RETURN_ZERO
 
-L2537:  lda     L32F7
-        ora     L32F8
+DO_RAND
+	lda     RAND_SEED
+        ora     RAND_SEED+1
         bne     L2580
-        lda     Z_OPERAND1+1
-        bpl     L255A
-        eor     #$FF
-        sta     L32F8
+        lda     Z_OPERAND1+1	; they're zero, so we're in initial state.
+        bpl     L255A		; positive number?
+        eor     #$FF		; negative, so seed to that value
+        sta     RAND_SEED+1
         lda     Z_OPERAND1
         eor     #$FF
-        sta     L32F7
-        inc     L32F7
+        sta     RAND_SEED
+        inc     RAND_SEED
         lda     #$00
         sta     $47
         sta     Z_CURRENT_WINDOW
-        beq     L2580
+        beq     L2580		; effectively a jmp L2580
 L255A:  lda     Z_OPERAND1
-        sta     $7B
+        sta     Z_OPERAND2
         lda     Z_OPERAND1+1
-        sta     $7C
-        jsr     L3665
-        stx     Z_OPERAND1
+        sta     Z_OPERAND2+1
+        jsr     RNG_HW
+        stx     Z_OPERAND1	; should be very random
         and     #$7F
-        sta     Z_OPERAND1+1
-        jsr     L2296
-        lda     L32EA
+        sta     Z_OPERAND1+1	; also should be very random
+        jsr     DO_MATH_DIV
+        lda     MATH_SCRATCH2	; remainder high-byte
         clc
         adc     #$01
         sta     Z_VECTOR1
-        lda     L32EB
+        lda     MATH_SCRATCH2+1 ; remainder low-byte
         adc     #$00
         sta     Z_VECTOR1+1
         jmp     RETURN_NULL
 
 L2580:  lda     Z_CURRENT_WINDOW
-        cmp     L32F8
+        cmp     RAND_SEED+1
         bcc     L2598
         lda     $47
-        cmp     L32F7
+        cmp     RAND_SEED
         bcc     L2598
         beq     L2598
         lda     #$01
@@ -2892,9 +2894,9 @@ L25CA:  lda     $7F
         bne     L25E1
         lda     Z_OPERAND1
         sta     Z_OPERAND1+1
-L25E1:  lda     $7B
+L25E1:  lda     Z_OPERAND2
         sta     $14
-        lda     $7C
+        lda     Z_OPERAND2+1
         sta     $15
         lda     #$00
         sta     $16
@@ -2952,8 +2954,8 @@ Z_NOT   lda     Z_OPERAND1
         sta     Z_VECTOR1+1
         jmp     RETURN_NULL
 
-Z_COPY_TABLE   lda     $7B
-        ora     $7C
+Z_COPY_TABLE   lda     Z_OPERAND2
+        ora     Z_OPERAND2+1
         bne     L266D
         jmp     L2721
 
@@ -2963,13 +2965,13 @@ L266D:  lda     $7E
         jmp     L2748
 
 L2676:  lda     Z_OPERAND1+1
-        cmp     $7C
+        cmp     Z_OPERAND2+1
         bcc     L2689
         beq     L2681
         jmp     L26A2
 
 L2681:  lda     Z_OPERAND1
-        cmp     $7B
+        cmp     Z_OPERAND2
         beq     L2689
         bcs     L26A2
 L2689:  lda     Z_OPERAND1
@@ -2978,11 +2980,11 @@ L2689:  lda     Z_OPERAND1
         sta     Z_VECTOR2
         lda     Z_OPERAND1+1
         adc     $7E
-        cmp     $7C
+        cmp     Z_OPERAND2+1
         bcc     L26A2
         bne     L26DA
         lda     Z_VECTOR2
-        cmp     $7B
+        cmp     Z_OPERAND2
         beq     L26A2
         bcs     L26DA
 L26A2:  lda     #$00
@@ -2992,9 +2994,9 @@ L26A2:  lda     #$00
         lda     Z_OPERAND1
         sta     $14
         jsr     L1777
-        lda     $7B
+        lda     Z_OPERAND2
         sta     Z_VECTOR2
-        lda     $7C
+        lda     Z_OPERAND2+1
         clc
         adc     Z_BASE_PAGE
         sta     Z_VECTOR2+1
@@ -3028,11 +3030,11 @@ L26DA:  lda     $7D
         clc
         adc     Z_BASE_PAGE
         sta     Z_VECTOR2+1
-        lda     $7B
+        lda     Z_OPERAND2
         clc
         adc     Z_VECTOR3
         sta     $0A
-        lda     $7C
+        lda     Z_OPERAND2+1
         adc     Z_VECTOR3+1
         clc
         adc     Z_BASE_PAGE
@@ -3097,7 +3099,7 @@ Z_LOG_SHIFT:  lda     Z_OPERAND1
         sta     Z_VECTOR1
         lda     Z_OPERAND1+1
         sta     Z_VECTOR1+1
-        lda     $7B
+        lda     Z_OPERAND2
         cmp     #$80
         bcs     L2785
         tay
@@ -3115,7 +3117,7 @@ L2788:  lsr     Z_VECTOR1+1
         bpl     L2788
         jmp     RETURN_NULL
 
-Z_ART_SHIFT   lda     $7B
+Z_ART_SHIFT   lda     Z_OPERAND2
         cmp     #$80
         bcc     Z_LOG_SHIFT
         ldx     Z_OPERAND1
@@ -3145,14 +3147,14 @@ Z_AREAD   lda     Z_OPERAND1+1
         dex
         beq     L27DD
         ldx     #$00
-        lda     $7C
-        ora     $7B
+        lda     Z_OPERAND2+1
+        ora     Z_OPERAND2
         beq     L27DD
-        lda     $7C
+        lda     Z_OPERAND2+1
         clc
         adc     Z_BASE_PAGE
         sta     $4C
-        lda     $7B
+        lda     Z_OPERAND2
         sta     $4B
         ldx     #$01
 L27DD:  stx     L32F4
@@ -3277,11 +3279,11 @@ Z_TOKENIZE   lda     Z_OPERAND1+1
         sta     $4A
         lda     Z_OPERAND1
         sta     $49
-        lda     $7C
+        lda     Z_OPERAND2+1
         clc
         adc     Z_BASE_PAGE
         sta     $4C
-        lda     $7B
+        lda     Z_OPERAND2
         sta     $4B
         dec     $77
         dec     $77
@@ -3930,10 +3932,10 @@ L2DF8:  stx     $6B
 
 L2E03:  inx
         stx     $6C
-        lda     $7C
+        lda     Z_OPERAND2+1
         clc
         adc     Z_BASE_PAGE
-        ldx     $7B
+        ldx     Z_OPERAND2
         stx     $3F
         sta     $40
         lda     #$02
@@ -3974,7 +3976,7 @@ Z_SET_CURSOR   jsr     L2DA9
         beq     L2E5A
         ldx     Z_OPERAND1
         dex
-        ldy     $7B
+        ldy     Z_OPERAND2
         dey
         clc
         jsr     PLOT
@@ -4154,7 +4156,7 @@ Z_PRINT_TABLE   lda     Z_OPERAND1
         lda     #$00
         sta     $16
         jsr     L1777
-        lda     $7B
+        lda     Z_OPERAND2
         cmp     #$00
         beq     L2FE8
         sta     Z_VECTOR3+1
@@ -4481,7 +4483,7 @@ L3210:  jsr     L2DA9
         bne     L3222
         jmp     L327C
 
-L3222:  lda     $7B
+L3222:  lda     Z_OPERAND2
         sta     Z_VECTOR2+1
         lda     #$00
         sta     Z_VECTOR3+1
@@ -4595,10 +4597,8 @@ L32E4:  .byte 0
 L32E5:  .byte 0
 L32E6:  .byte 0
 L32E7:  .byte 0
-L32E8:  .byte 0
-L32E9:  .byte 0
-L32EA:  .byte 0
-L32EB:  .byte 0
+MATH_SCRATCH1:  .word 0
+MATH_SCRATCH2:  .word 0
 L32EC:  .byte 0
 L32ED:  .byte 0
 L32EE:  .byte 0
@@ -4608,9 +4608,9 @@ L32F1:  .byte 0
 L32F2:  .byte 0
         .byte 0
 L32F4:  .byte 0
-;REU_PRESENT:  .byte 0
-L32F7:  .byte 0
-L32F8:  .byte 0
+
+RAND_SEED:  .word 0
+
 L32F9:  .byte 0
 L32FA:  .byte 0
 L32FB:  .byte 0
@@ -4928,13 +4928,13 @@ Z_DRAW_PICTURE   rts
 Z_PICTURE_DATA   jmp     L1599
 
 Z_SET_MARGINS   jsr     L2DA9
-        lda     $7B
+        lda     Z_OPERAND2
         sta     Z_HDR_STATIC+1
         lda     Z_OPERAND1
         sta     Z_HDR_ROUTINES+1
         lda     #$27
         sec
-        sbc     $7B
+        sbc     Z_OPERAND2
         sbc     Z_OPERAND1
         beq     L3612
         bmi     L3612
@@ -4990,16 +4990,19 @@ L3658:  lda     $A2
         sta     SIGVOL
         rts
 
-L3665:  inc     RANDOM
-        dec     $D012
+RNG_HW
+.(
+	inc     RANDOM
+        dec     RASTER
         lda     RANDOM
         adc     $8C
         tax
-        lda     $D012
+        lda     RASTER
         sbc     $8D
         sta     $8C
         stx     $8D
         rts
+.)
 
 CLEAR_SCREEN
 	lda     #>VICSCN
@@ -5221,7 +5224,7 @@ L3C4Ba
         clc
         adc     Z_BASE_PAGE
         sta     PAGE_VECTOR+1
-        ldx     $7C
+        ldx     Z_OPERAND2+1
         inx
         stx     Z_VECTOR2
         jmp     L3C88
