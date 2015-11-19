@@ -6,6 +6,12 @@ LOG_TO_PRINTER
 	rts
 .)
 
+; This fatal error is common.
+
+FATAL_ERROR_0E
+        lda     #$0E
+        jmp     FATAL_ERROR
+
 ; retrieve page from somewhere in RAM (including under ROM) and stash it where
 ; PAGE_VECTOR points.
 

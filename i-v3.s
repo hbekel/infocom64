@@ -2098,10 +2098,6 @@ L1AF5:  lda     Z_STORY_INDEX
         rts
 .)
 
-FATAL_ERROR_0E
-	lda     #$0E
-        jmp     FATAL_ERROR
-
 L1B47:  ldx     #$00
         stx     $2E
         lda     Z_STORY_PAGE_INDEX

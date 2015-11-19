@@ -5403,9 +5403,6 @@ Z_ILLEGAL1   rts
 
 Z_SAVE_RESTORE_UNDO   jmp     RETURN_ZERO
 
-FATAL_ERROR_0E:  lda     #$0E
-        jmp     FATAL_ERROR
-
 ;
 ; local status stuff
 ;

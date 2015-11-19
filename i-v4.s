@@ -5078,9 +5078,6 @@ L3645:  lda     $0F26,x
         jmp     L141F
 .)
 
-FATAL_ERROR_0E:  lda     #$0E
-        jmp     FATAL_ERROR
-
 ;
 ; local status stuff
 ;
