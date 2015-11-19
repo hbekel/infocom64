@@ -693,9 +693,9 @@ L1411:  dec     Z_STACK_POINTER
 
 RETURN_ZERO:  lda     #$00
         ldx     #$00
-L141F:  sta     Z_VECTOR1
+RETURN_VALUE:  sta     Z_VECTOR1
         stx     Z_VECTOR1+1
-RETURN_VALUE:  jsr     FETCH_NEXT_ZBYTE
+RETURN_NULL:  jsr     FETCH_NEXT_ZBYTE
         beq     PUSH_VECTOR1_TO_STACK
 L1428:  cmp     #$10
         bcs     SET_GLOBAL_WORD
@@ -1129,7 +1129,7 @@ L167E:  lda     (Z_VECTOR2),y
         tax
         iny
         lda     (Z_VECTOR2),y
-        jsr     L141F
+        jsr     RETURN_VALUE
         lda     Z_VECTOR1
         bne     L168F
         lda     Z_VECTOR1+1
@@ -1147,7 +1147,7 @@ Z_GET_PARENT:  lda     Z_OPERAND1
         tax
         iny
         lda     (Z_VECTOR2),y
-        jmp     L141F
+        jmp     RETURN_VALUE
 
 ; 1OP:132 4 get_prop_len property-address -> (result)
 ; Get length of property data (in bytes) for the given object's property.
@@ -1178,7 +1178,7 @@ L16C4:  lda     #$01
         bne     L16CA
 L16C8:  and     #$3F
 L16CA:  ldx     #$00
-        jmp     L141F
+        jmp     RETURN_VALUE
 .)
 
 ; 1OP:133 5 inc (variable)
@@ -1339,7 +1339,7 @@ L17BD:  jsr     Z_POP
         sta     Z_SOMETHING_NOT_PC
         jsr     VIRT_TO_PHYS_ADDR_1
         jsr     L14DE
-L17D6	jmp	RETURN_VALUE
+L17D6	jmp	RETURN_NULL
 
 ; 1OP:140 C jump ?(label)
 ; Jump (unconditionally) to the given label. (This is not a branch instruction
@@ -1363,7 +1363,7 @@ Z_PRINT_PADDR   lda     Z_OPERAND1
 
 Z_LOAD   lda     Z_OPERAND1
         jsr     L137B
-        jmp     RETURN_VALUE
+        jmp     RETURN_NULL
 
 ; 1OP:143 F 1/4 not value -> (result)
 ; Bitwise NOT (i.e., all 16 bits reversed).
@@ -1375,7 +1375,7 @@ Z_NOT   lda     Z_OPERAND1
         eor     #$FF
 RETURN_VECTOR1:  stx     Z_VECTOR1
         sta     Z_VECTOR1+1
-        jmp     RETURN_VALUE
+        jmp     RETURN_NULL
 
 ; 2OP:2 2 jl a b ?(label)
 ; Jump if a < b (using a signed 16-bit comparison).
@@ -1582,7 +1582,7 @@ Z_LOADW
 L192D:  sta     Z_VECTOR1+1
         jsr     FETCH_BYTE_FROM_VECTOR
         sta     Z_VECTOR1
-        jmp     RETURN_VALUE
+        jmp     RETURN_NULL
 
 ; 2OP:16 10 loadb array byte-index -> (result)
 ; Stores array->byte-index (i.e., the byte at address array+byte-index,
@@ -1629,7 +1629,7 @@ L196A:  lda     Z_OPERAND2
         iny
         lda     (Z_OBJECTS_ADDR),y
         sta     Z_VECTOR1
-        jmp     RETURN_VALUE
+        jmp     RETURN_NULL
 L197D:  jsr     L271C
         iny
         cmp     #$01
@@ -1647,7 +1647,7 @@ L1994:  lda     (Z_VECTOR2),y
         lda     (Z_VECTOR2),y
 L199A:  sta     Z_VECTOR1
         stx     Z_VECTOR1+1
-        jmp     RETURN_VALUE
+        jmp     RETURN_NULL
 
 ; 2OP:18 12 get_prop_addr object property -> (result)
 ; Get the byte address (in dynamic memory) of the property data for the given
@@ -1729,7 +1729,7 @@ L14	iny
         sec
         sbc    Z_BASE_PAGE		; reufix
         sta     Z_VECTOR1+1
-        jmp     RETURN_VALUE
+        jmp     RETURN_NULL
 .)
 L1A2D:  jmp     RETURN_ZERO
 
@@ -1754,7 +1754,7 @@ L1A37:  jsr     L2717
 L1A46:  jsr     L2734
 L1A49:  jsr     L2717
         ldx     #$00
-        jmp     L141F
+        jmp     RETURN_VALUE
 
 ; 2OP:20 14 add a b -> (result)
 ; Signed 16-bit addition.
@@ -1934,7 +1934,7 @@ Z_CALL:	lda     Z_OPERAND1
         ora     Z_OPERAND1+1
         bne     L1B9B
         ldx     #$00
-        jmp     L141F
+        jmp     RETURN_VALUE
 L1B9B:  ldx     $66
         lda     Z_SOMETHING_NOT_PC
         jsr     PUSH_AX_TO_STACK
@@ -2192,7 +2192,7 @@ L2	lda     Z_OPERAND1
         lda     L2CA8
         adc     #$00
         sta     Z_VECTOR1+1
-        jmp     RETURN_VALUE
+        jmp     RETURN_NULL
 L3	lda     $62
         cmp     Z_OPERAND1+1
         bcc     L5
@@ -2222,7 +2222,7 @@ L7	lda     $44
         inc     $44
         bne     L8
         inc     Z_CURRENT_WINDOW
-L8	jmp     RETURN_VALUE
+L8	jmp     RETURN_NULL
 .)
 
 ; VAR:232 8 push value
@@ -2274,12 +2274,12 @@ L1DE7:  sec
 L1DF2:  sta     Z_VECTOR1
         lda     $15
         sta     Z_VECTOR1+1
-        jsr     RETURN_VALUE
+        jsr     RETURN_NULL
         jmp     L1468
 L1DFE:  lda     #$00		; shouldn't this be RETURN_ZERO?
         sta     Z_VECTOR1
         sta     Z_VECTOR1+1
-        jsr     RETURN_VALUE
+        jsr     RETURN_NULL
         jmp     L145C
 
 ; VAR:228 4 1 sread text parse
@@ -4124,7 +4124,7 @@ L2B94:  cmp     L2BA9,x
         bmi     L2BA1
 L2B9E:  lda     L2BAF,x
 L2BA1:  ldx     #$00
-        jmp     L141F
+        jmp     RETURN_VALUE
 
         jmp     RETURN_ZERO
 
@@ -4943,7 +4943,7 @@ L6	jsr     REQUEST_STATUS_LINE_REDRAW
         sta     $5B
         lda     #$01
         ldx     #$00
-        jmp     L141F
+        jmp     RETURN_VALUE
 .)
 
 Z_RESTORE:
@@ -5075,7 +5075,7 @@ L3645:  lda     $0F26,x
         sta     $5B
         lda     #$02
         ldx     #$00
-        jmp     L141F
+        jmp     RETURN_VALUE
 .)
 
 ;
