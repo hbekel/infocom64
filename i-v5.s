@@ -4192,7 +4192,8 @@ L2FC6:  jsr     FETCH_BYTE_FROM_VECTOR
 
 L2FE8:  rts
 
-Z_SET_FONT   lda     Z_OPERAND1
+Z_SET_FONT
+	lda     Z_OPERAND1
         ldx     Z_CURRENT_WINDOW
         cmp     L3307,x
         beq     L2FF7
