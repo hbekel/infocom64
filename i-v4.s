@@ -35,8 +35,9 @@
 ; * C128 80 column support
 
 #include "c64.inc"
+#undef CKNOIO
 
-MAP_RAM =		%11111100
+MAP_RAM =		%11111101
 MAP_ROM =		%00000010
 
 REU_PRESENT =           $02     ; 0 (0000) = no REU (death mode)
@@ -2730,10 +2731,6 @@ VIRT_TO_PHYS_ADDR
 					; handle resident here
         adc     #>Z_HEADER		; calculate physical address
         sta     Z_CURRENT_PHYS_PC_ALT+1
-        cmp     #>IO_ADDR		; are we hitting $D000?
-        bcc     L1
-        adc     #$0F			; if so, go up to $E000 (carry adds 1)
-        sta     Z_CURRENT_PHYS_PC_ALT+1
 L1	rts
 
 L2	lda     $16			; we are above resident space
@@ -2756,10 +2753,6 @@ VIRT_TO_PHYS_ADDR_1
         bcs     L2
 					; handle resident here.
         adc     #>Z_HEADER
-        sta     Z_CURRENT_PHYS_PC+1
-        cmp     #>IO_ADDR
-        bcc     L1
-        adc     #$0F
         sta     Z_CURRENT_PHYS_PC+1
 L1	rts
 
@@ -5108,17 +5101,11 @@ L1	lda     SECTOR_BUFFER,y
         ora     #MAP_ROM
         sta     R6510
         cli
-	inc     STORY_INDEX
+	inc	PAGE_VECTOR+1		; begin CK
+        inc     STORY_INDEX
         bne     L2
-        inc     STORY_INDEX+1
-L2	inc     PAGE_VECTOR+1
-        lda     PAGE_VECTOR+1
-        cmp     #>IO_ADDR		; are we now stomping on $d000?
-        bne     L3
-        clc
-        adc     #$10                    ; yeah, skip it and go on to $e000
-        sta     PAGE_VECTOR+1
-L3	rts
+        inc     STORY_INDEX+1		; end CK
+L2	rts
 .)
 
 ;
