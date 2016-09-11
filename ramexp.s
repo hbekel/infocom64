@@ -68,33 +68,35 @@ REU_DETECT:
         inc     REU_BANKS
         lda     #$BB
         ldx     #$03
-        jsr     REU_CHECK_BANK          ; do we have bank 3
+        jsr     REU_CHECK_BANK          ; do we have bank 3?
         bcs     L1
-        inc     REU_BANKS
+        inc     REU_BANKS		; at this point, we have at least a
+					; 1750, so we're good.  All further
+					; tests just increment the bank count
         lda     #$BA
         ldx     #$04
         jsr     REU_CHECK_BANK          ; do we have bank 4
-        bcs     L1
+        bcs     L0
         inc     REU_BANKS
         lda     #$B9
         ldx     #$05
         jsr     REU_CHECK_BANK          ; do we have bank 5
-        bcs     L1
+        bcs     L0
         inc     REU_BANKS
         lda     #$B8
         ldx     #$06
         jsr     REU_CHECK_BANK          ; do we have bank 6
-        bcs     L1
+        bcs     L0
         inc     REU_BANKS
         lda     #$B7
         ldx     #$07
         jsr     REU_CHECK_BANK          ; do we have bank 7
-        bcs     L1
+        bcs     L0
         inc     REU_BANKS
-        lda     REU_PRESENT
+L0	lda     REU_PRESENT
         ora     #$01
         sta     REU_PRESENT
-        sec
+	sec
         rts
 L1
         clc
