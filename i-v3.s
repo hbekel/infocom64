@@ -2830,20 +2830,12 @@ L2151:  lda     INPUT_BUFFER,x
         jsr     READ_GLOBAL_WORD
         lda     Z_FLAGS	; 0=score/turns, 1=hours:mins
         bne     SHOW_TIME
-        lda     #"S"	; Why are we doing this with strings already defined?
-        jsr     PUT_CHAR_ALT
-        lda     #"c"
-        jsr     PUT_CHAR_ALT
-        lda     #"o"
-        jsr     PUT_CHAR_ALT
-        lda     #"r"
-        jsr     PUT_CHAR_ALT
-        lda     #"e"
-        jsr     PUT_CHAR_ALT
-        lda     #":"
-        jsr     PUT_CHAR_ALT
-        lda     #" "
-        jsr     PUT_CHAR_ALT
+	ldy	#0
+L21DEa	lda	SCORE_TEXT,y
+	jsr	PUT_CHAR_ALT
+	iny
+	cpy	#7
+	bne L21DEa
         lda     Z_VECTOR1
         sta     $56
         lda     Z_VECTOR1+1
@@ -2851,18 +2843,13 @@ L2151:  lda     INPUT_BUFFER,x
         jsr     L182B
         lda     #$2F
         bne     L21F0
-SHOW_TIME:  lda     #"T"
+SHOW_TIME:
+	ldy	#0
+L21DFa	lda	TIME_TEXT,y
         jsr     PUT_CHAR_ALT
-        lda     #"i"
-        jsr     PUT_CHAR_ALT
-        lda     #"m"
-        jsr     PUT_CHAR_ALT
-        lda     #"e"
-        jsr     PUT_CHAR_ALT
-        lda     #":"
-        jsr     PUT_CHAR_ALT
-        lda     #" "
-        jsr     PUT_CHAR_ALT
+	iny
+	cpy	#6
+	bne 	L21DFa
         lda     Z_VECTOR1
         bne     L21DF
         lda     #$18
