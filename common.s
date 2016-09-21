@@ -424,21 +424,21 @@ PREF_LOG_ADDR   .word   0
 
 
 RESTORE_POSITION_TEXT:
-        .byte   "Restore Position", $0d
+        .aasc   "Restore Position", $0d
 RESTORING_POSITION_TEXT:
-        .byte   $0d, "Restoring position "
+        .aasc   $0d, "Restoring position "
 REST_POS_NUMBER
-        .byte   "* ...", $0d
+        .aasc   "* ...", $0d
 REST_FILENAME
-        .byte "SAVE"
+        .byte	"SAVE"
 REST_FN
         .byte "*,R"
 SAVE_POSITION_TEXT
-        .byte   "Save Position", $0d
+        .aasc   "Save Position", $0d
 SAVING_POSITION_TEXT
-        .byte   $0d, "Saving position "
+        .aasc   $0d, "Saving position "
 SAVE_POS_NUMBER
-        .byte   "* ...", $0d
+        .aasc   "* ...", $0d
 SCRATCH_FILENAME
         .byte "S0:"
 SAVE_FILENAME
@@ -447,22 +447,22 @@ SAVE_FN
         .byte "*,W"
 BLANK_TEXT
         .byte "      "
-END_SESSION_TEXT: .byte "End of session.", $0d, $0d
-                .byte "Press [RETURN] to restart.", $0d ; extra gunk >v3
+END_SESSION_TEXT: .aasc "End of session.", $0d, $0d
+                .aasc "Press [RETURN] to restart.", $0d ; extra gunk >v3
 
-REU_TXT:	.byte "(Loading story data into REU)", $0d
-CBM_REU_TXT:	.byte "(Loading story data into C= REU)", $0d
-GEO_RAM_TXT:	.byte "(Loading story data into GeoRAM)", $0d
+REU_TXT:	.aasc "(Loading story data into REU)", $0d
+CBM_REU_TXT:	.aasc "(Loading story data into C= REU)", $0d
+GEO_RAM_TXT:	.aasc "(Loading story data into GeoRAM)", $0d
 
-PATIENT: .byte "(Loading resident code into system RAM)", $0d
+PATIENT: .aasc "(Loading resident code into system RAM)", $0d
 STORY_LOADING_TEXT
-        .byte   "The story is loading ...", $0d
+        .aasc  "The story is loading ...", $0d
 YES_TEXT
-        .byte "YES", $0d
+        .aasc "YES", $0d
 NO_TEXT
-        .byte "NO", $0d
+        .aasc "NO", $0d
 
-INT_ERROR_TEXT .byte "Internal error 00.  "
+INT_ERROR_TEXT .aasc "Internal error 00.  "
 
 VALID_PUNCTUATION:  
         .byte   $00, $0d
