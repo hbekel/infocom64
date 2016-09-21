@@ -983,10 +983,10 @@ Z_RET_POPPED
         jmp     L15B4
 
 VERSION_TEXT:
-	.byte   "C64 Version 8L (CUR_DATE-01)", $0d
-	.byte   "uIEC fixes by Chris Kobayashi", $0d
-	.byte   "For Saya, Ao, Karie, and the KobaCats", $0d
-	.byte   $0d
+	.aasc   "C64 Version 8L (CUR_DATE-01)", $0d
+	.aasc   "uIEC fixes by Chris Kobayashi", $0d
+	.aasc   "For Saya, Ao, Karie, and the KobaCats", $0d
+	.aasc   $0d
 VERSION_LENGTH = 30 + 29 + 38 + 1
 
 ; 0OP:189 D 3 verify ?(label)
@@ -2431,7 +2431,7 @@ L1EF2:  lda     $26
         bne     L1EF2
 L1F07:  rts
 
-PUNCT_LIST:  .byte	"!?,.", $0d, " "
+PUNCT_LIST:  .aasc	"!?,.", $0d, " "
 
 L1F0E:  jsr     L1F1F
         bcs     L1F48
@@ -4272,7 +4272,7 @@ L2CAE:  brk
 L2CAF:  brk
         brk
 
-MORE_TEXT:	.byte "[MORE]"
+MORE_TEXT:	.aasc "[MORE]"
 
 GET_KEY_RETRY:  ldx     #$FF
         stx     $0340
@@ -4752,7 +4752,7 @@ DO_CARRIAGE_RETURN
         rts
 .)
 
-DEFAULT_SLOT_TEXT:	.byte	" (Default is *):"
+DEFAULT_SLOT_TEXT:	.aasc	" (Default is *):"
 
 PRINT_DEFAULT_SLOT:  clc
         adc     #$31
@@ -4767,12 +4767,12 @@ PRINT_DEFAULT_SLOT:  clc
         stx     SPENA
         rts
 
-SAVE_SLOT_TEXT:	.byte	$0d, "Position 1-"
-SAVE_SLOT:  .byte	"*"
+SAVE_SLOT_TEXT:	.aasc	$0d, "Position 1-"
+SAVE_SLOT:  .aasc	"*"
 
 POS_CONFIRM_TEXT:
-	.byte	$0d, $0d, "Position *."
-	.byte	$0d, "Are you sure? (Y or N):"
+	.aasc	$0d, $0d, "Position *."
+	.aasc	$0d, "Are you sure? (Y or N):"
 
 #define	POS_TEXT_LENGTH	#$25
 #define	CONFIRM_TEXT_LENGTH #$12
@@ -4872,7 +4872,7 @@ L1	jsr     GETIN
 L2	rts
 .)
 
-PRESS_RETURN_TEXT: .byte $0d, "Press [RETURN] to continue.", $0d, $0d
+PRESS_RETURN_TEXT: .aasc $0d, "Press [RETURN] to continue.", $0d, $0d
 
 Z_SAVE
 .(

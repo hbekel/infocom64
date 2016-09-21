@@ -105,7 +105,7 @@ STARTUP
         ldx     #$FF
         txs
         jsr     CLALL
-        jsr     CLEAR_SCREEN
+;        jsr     CLEAR_SCREEN
         ldy     #$08
         ldx     #$0B
         clc
@@ -3615,29 +3615,29 @@ L2	rts
 ; string area here
 
 POSITION_TEXT:
-	.byte $0d, "Position 1-", $30+SAVE_SLOTS
+	.aasc $0d, "Position 1-", $30+SAVE_SLOTS
 
 POS_CONFIRM_TEXT:
-	.byte $0d, $0d, "Position *."
-	.byte $0d, "Are you sure? (Y/N) >" ; 22
+	.aasc $0d, $0d, "Position *."
+	.aasc $0d, "Are you sure? (Y/N) >" ; 22
 
 L1994
 	.byte	$21, $3f, $2c, $2e, $0d, $20
 
 VERSION_TEXT
-	.byte	"C64 Version I (CUR_DATE-01)", $0d
-	.byte	"uIEC/EasyFlash code by Chris Kobayashi", $0d
-	.byte	"For Saya, Ao, Karie, and the KobaCats", $0d
-	.byte	$0d
+	.aasc	"C64 Version I (CUR_DATE-01)", $0d
+	.aasc	"uIEC/EasyFlash code by Chris Kobayashi", $0d
+	.aasc	"For Saya, Ao, Karie, and the KobaCats", $0d
+	.aasc	$0d
 VERSION_LENGTH = 30 + 39 + 38 + 1
 MORE_TEXT
-	.byte $5b, "MORE", $5d
+	.aasc $5b, "MORE", $5d
 
 DEFAULT_TEXT
-	.byte	" (Default = *) >
+	.aasc	" (Default = *) >
 PRESS_RETURN_TEXT
-	.byte	$0d, "Press [RETURN] to continue."
-	.byte	$0d, ">"
+	.aasc	$0d, "Press [RETURN] to continue."
+	.aasc	$0d, ">"
 
 ;
 ; local status stuff
