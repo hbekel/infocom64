@@ -207,7 +207,7 @@ L3      lda     SECTOR_BUFFER,y
         rts
 .)
 
-STORY_TEXT:     .byte   "STORY.DAT,R"
+STORY_TEXT:     .asc   "story.dat,r"
 
 COMMAND_OPEN:
 .(
@@ -402,7 +402,7 @@ L5	jsr	CLRCHN
         jmp     CLOSE
 .)
 
-PREF_FILENAME   .byte   "PREFS,R"
+PREF_FILENAME   .asc   "prefs,r"
 
 #ifdef  CK_PREFS
 MY_COLOR =              $01
@@ -430,9 +430,9 @@ RESTORING_POSITION_TEXT:
 REST_POS_NUMBER
         .aasc   "* ...", $0d
 REST_FILENAME
-        .byte	"SAVE"
+        .asc	"save"
 REST_FN
-        .byte "*,R"
+        .asc "*,r"
 SAVE_POSITION_TEXT
         .aasc   "Save Position", $0d
 SAVING_POSITION_TEXT
@@ -440,11 +440,11 @@ SAVING_POSITION_TEXT
 SAVE_POS_NUMBER
         .aasc   "* ...", $0d
 SCRATCH_FILENAME
-        .byte "S0:"
+        .asc "s0:"
 SAVE_FILENAME
-        .byte "SAVE"
+        .asc "save"
 SAVE_FN
-        .byte "*,W"
+        .asc "*,w"
 BLANK_TEXT
         .byte "      "
 END_SESSION_TEXT: .aasc "End of session.", $0d, $0d

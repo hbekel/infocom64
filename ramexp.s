@@ -19,6 +19,8 @@ GEORAM_SIZE
 GEORAM_TEMP
 	.byte 0
 
+REU_BITS
+	.byte 7
 REU_BANKS
 	.byte 0
 
@@ -50,12 +52,25 @@ L2a	lda	SCRATCH_RAM,x
 	rts
 .)
 
-REU_DETECT:	; 2c35
+DET_TXT	.byte "Detected a ",0
+REUk_TXT .byte "k REU",0
+GEO_TXT .byte "k Geo/NeoRAM",0
+C128_TXT		.byte " 128"
+C128A_TXT	.byte " 256"
+C128B_TXT	.byte " 512"
+C128C_TXT	.byte "1024"
+C128D_TXT	.byte "2048"
+C128E_TXT	.byte "4096"
+C128F_TXT	.byte "8192"
+C128G_TXT	.byte "16384"
+
+REU_DETECT:	; 2c75
 .(
 	ldy	#$ff
 L0	jsr     REU_SETUP_BANK          ; do we have bank 0?
 	jsr	REU_CHECK_BANK
 	bcc	L1
+	dec	REU_BITS
 	clc
 	tya
 	lsr
@@ -68,7 +83,36 @@ L1	sty	REU_BANKS
 	lda	REU_PRESENT
         ora     #$01
 	sta	REU_PRESENT
-	sec
+	ldy	#5
+	ldx	#5
+	clc
+	jsr	PLOT
+	ldy	#0
+L1a	lda	DET_TXT,y
+	cmp	#0
+	beq L1a1
+	jsr	CHROUT
+	iny
+	bne 	L1a
+L1a1	lda	REU_BITS
+	asl				; x2
+	asl				; x4
+	tay
+	ldx	#0
+L1b	lda	C128_TXT,y
+	jsr	CHROUT
+	inx
+	iny
+	cpx	#4
+	bne	L1b
+	ldy	#0
+L1b1	lda	REUk_TXT,y
+	cmp #0
+	beq L1b1a
+	jsr	CHROUT
+	iny
+	bne 	L1b1
+L1b1a	sec
 	rts
 
 L2	lda     REU_PRESENT
