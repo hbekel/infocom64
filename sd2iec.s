@@ -1,20 +1,20 @@
 ; $Id$
 
 UIEC_SAVEROOT_TXT1
-        .byte   "MD", $2f, $2f, "INFOSAVE",0
+        .asc	"md", $2f, $2f, "infosave",0
 UIEC_SAVEROOT_TXT2
-        .byte   "CD", $2f, $2f, "INFOSAVE",0
+        .asc	"cd", $2f, $2f, "infosave",0
 UIEC_SAVEROOT_TXT3
-        .byte   "MD", $2f, $2f, "INFOSAVE", $2f, ":000.000000"
+        .asc	"md", $2f, $2f, "infosave", $2f, ":000.000000"
 #define	UIEC_REL_OFFSET	14
 UIEC_RESET_TXT
-        .byte   "UI"
+        .asc	"ui"
 UIEC_ID1_TXT
-        .byte   "SD2IEC",0
+        .asc	"sd2iec",0
 UIEC_ID2_TXT
-	.byte	"UIEC",0
+	.asc	"uiec",0
 UIEC_SEEK_TXT
-	.byte	"P", 0, 0, 0, 0, 0
+	.asc	"p", 0, 0, 0, 0, 0
 
 UIEC_BUFFER	= $0900		; sure, why not?
 

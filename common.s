@@ -208,6 +208,8 @@ L3      lda     SECTOR_BUFFER,y
 .)
 
 STORY_TEXT:     .asc   "story.dat,r"
+SCORE_TEXT:	.aasc	"Score: "
+TIME_TEXT:	.aasc	"Time: "
 
 COMMAND_OPEN:
 .(
