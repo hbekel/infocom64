@@ -50,114 +50,89 @@ L2a	lda	SCRATCH_RAM,x
 	rts
 .)
 
-REU_DETECT:
+REU_DETECT:	; 2c35
 .(
-        lda     #$55
-        stx     REU_BANKS
-        jsr     REU_CHECK_BANK          ; do we have bank 0?
-        bcs     L1
-        lda     #$AA
-        ldx     #$01
-        jsr     REU_CHECK_BANK          ; do we have bank 1?
-        bcs     L1
-        inc     REU_BANKS
-        lda     #$FE
-        ldx     #$02
-        jsr     REU_CHECK_BANK          ; do we have bank 2?
-        bcs     L1
-        inc     REU_BANKS
-        lda     #$BB
-        ldx     #$03
-        jsr     REU_CHECK_BANK          ; do we have bank 3?
-        bcs     L1
-        inc     REU_BANKS		; at this point, we have at least a
-					; 1750, so we're good.  All further
-					; tests just increment the bank count
-        lda     #$BA
-        ldx     #$04
-        jsr     REU_CHECK_BANK          ; do we have bank 4
-        bcs     L0
-        inc     REU_BANKS
-        lda     #$B9
-        ldx     #$05
-        jsr     REU_CHECK_BANK          ; do we have bank 5
-        bcs     L0
-        inc     REU_BANKS
-        lda     #$B8
-        ldx     #$06
-        jsr     REU_CHECK_BANK          ; do we have bank 6
-        bcs     L0
-        inc     REU_BANKS
-        lda     #$B7
-        ldx     #$07
-        jsr     REU_CHECK_BANK          ; do we have bank 7
-        bcs     L0
-        inc     REU_BANKS
-L0	lda     REU_PRESENT
+	ldy	#$ff
+L0	jsr     REU_SETUP_BANK          ; do we have bank 0?
+	jsr	REU_CHECK_BANK
+	bcc	L1
+	clc
+	tya
+	lsr
+	tay
+	bne 	L0
+
+L1	sty	REU_BANKS
+	cpy	#00
+	beq	L1
+	lda	REU_PRESENT
         ora     #$01
-        sta     REU_PRESENT
+	sta	REU_PRESENT
 	sec
-        rts
-L1
+	rts
+
+L2	lda     REU_PRESENT
+	and	#$FE
+        sta     REU_PRESENT
         clc
         rts
 .)
 
+REU_SETUP_BANK:	; 2c59
+.(
+        sty     Z_TEMP1			; bank number we're probing
+					; see if we already probed this bank
+L1      ldx     #$00
+	lda	#$bb
+L2      sta     SECTOR_BUFFER,x
+        inx
+        bne     L2
+
+        lda     #$00
+        sta     REU_RBASE+1
+        sta     REU_RBASE
+        sta     REU_INT
+        sta     REU_ACR
+        sta     REU_TLEN
+        lda     #$01
+        sta     REU_TLEN+1
+        lda     Z_TEMP1
+        sta     REU_RBASE+2
+        lda     #>SECTOR_BUFFER
+        sta     REU_CBASE+1
+        lda     #<SECTOR_BUFFER
+        sta     REU_CBASE
+        lda     #%11111100		; CBM -> REU
+        sta     REU_COMMAND
+	rts
+.)
+
 REU_CHECK_BANK:
 .(
-        stx     Z_VECTOR4
-        sta     Z_TEMP1
-L1      ldy     #$00
-L2      sta     SECTOR_BUFFER,y
-        iny
-        bne     L2
+	sty	Z_TEMP1
         lda     #$00
         sta     REU_RBASE+1
         sta     REU_RBASE
         sta     REU_INT
         sta     REU_ACR
         sta     REU_TLEN
-        lda     #$01
+        lda     #1
         sta     REU_TLEN+1
-        lda     Z_VECTOR4
-        sta     REU_RBASE+2
-        lda     #>SECTOR_BUFFER
-        sta     REU_CBASE+1
-        lda     #<SECTOR_BUFFER
-        sta     REU_CBASE
-        lda     #$FC
-        sta     REU_COMMAND
-        lda     #0
-        tay
-L3      sta     SECTOR_BUFFER,y
-        iny
-        bne     L3
-        lda     #$00
-        sta     REU_RBASE+1
-        sta     REU_RBASE
-        sta     REU_INT
-        sta     REU_ACR
-        sta     REU_TLEN
-        lda     #$01
-        sta     REU_TLEN+1
-        lda     Z_VECTOR4
-        sta     REU_RBASE+2
-        lda     #>SECTOR_BUFFER
-        sta     REU_CBASE+1
-        lda     #<SECTOR_BUFFER
-        sta     REU_CBASE
-        lda     #$FD
-        sta     REU_COMMAND
         lda     Z_TEMP1
-        ldy     #$00
-L4      cmp     SECTOR_BUFFER,y
-        bne     L5
-        iny
-        bne     L4
-        clc
-        rts
-L5      sec
-        rts
+        sta     REU_RBASE+2
+        lda     #>SECTOR_BUFFER
+        sta     REU_CBASE+1
+        lda     #<SECTOR_BUFFER
+        sta     REU_CBASE
+        lda     #%11111101		; REU -> CBM
+        sta     REU_COMMAND
+	lda	SECTOR_BUFFER
+	cmp	#$bb
+	beq	L2
+	sec
+	rts
+L2	clc
+	rts
 .)
 
 IREU_FETCH:
