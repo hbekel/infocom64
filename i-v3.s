@@ -105,7 +105,6 @@ STARTUP
         ldx     #$FF
         txs
         jsr     CLALL
-;        jsr     CLEAR_SCREEN
         ldy     #$08
         ldx     #$0B
         clc
@@ -233,11 +232,11 @@ L11	sta     $29
 L12	lda     STORY_INDEX
         cmp     Z_RESIDENT_ADDR
         bcs     L13
-	lda	REU_PRESENT
-	and	#%00000100
-	bne	L12a
-	jsr	DO_TWIRLY
-L12a
+;	lda	REU_PRESENT
+;	and	#%00000100
+;	bne	L12a
+;	jsr	DO_TWIRLY
+;L12a
 	ldx	#5
         jsr     READ_BUFFER
         jmp     L12
@@ -2143,20 +2142,13 @@ L1B87:  lda     Z_VECTOR2
         rts
 
 REU_LOAD_STORY
-	ldy	#$04
+	ldy	#$01
 	ldx	#$0d
 	clc
 	jsr	PLOT
-        lda     REU_PRESENT
-        and     #%00000011
-	cmp	#1
-	bne	L14C0
-	ldx	#<CBM_REU_TXT
-	lda	#>CBM_REU_TXT
-	bne	L14C0a
-L14C0	ldx	#<GEO_RAM_TXT
-	lda	#>GEO_RAM_TXT
-L14C0a	ldy	#$21
+	ldx	#<REU_TXT
+	lda	#>REU_TXT
+	ldy	#$28
 	jsr	PRINT_MESSAGE
 
 	lda     Z_HDR_FILE_LENGTH+1
@@ -2183,7 +2175,7 @@ L1C4A:  lsr
         sta     Z_VECTOR4
 L1C74:  jsr     DEC_PAGE_COUNT			; want to put breakpoint here
         bcc     L1C85
-	jsr	DO_TWIRLY
+;	jsr	DO_TWIRLY
         lda     #>SECTOR_BUFFER
         sta     PAGE_VECTOR+1
 	ldx	#5

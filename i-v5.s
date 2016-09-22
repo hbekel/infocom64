@@ -75,7 +75,7 @@ STARTUP:
         ldx     #$FF
         txs
         jsr     CLALL
-        jsr     CLEAR_SCREEN
+;        jsr     CLEAR_SCREEN
         ldy     #$08
         ldx     #$0B
         clc
@@ -305,7 +305,7 @@ L12BE:  lda     #$00
         sta     $6B
         ora     Z_HDR_FLAGS2+1
         sta	Z_HDR_FLAGS2+1
-L12E2:  jsr     CLEAR_SCREEN
+L12E2:  ;jsr     CLEAR_SCREEN
 
 MAIN_LOOP
 	lda     #$00
@@ -1196,20 +1196,13 @@ LQ0a
         rts
 
 LQ0aa
-        ldy     #$04
+        ldy     #$01
         ldx     #$0F
         clc
         jsr     PLOT
-        lda     REU_PRESENT
-        and     #%00000011
-        cmp     #1
-        bne     L14C0
-        ldx     #<CBM_REU_TXT
-        lda     #>CBM_REU_TXT
-        bne     L14C0a
-L14C0   ldx     #<GEO_RAM_TXT
-        lda     #>GEO_RAM_TXT
-L14C0a  ldy     #$21
+        ldx     #<REU_TXT
+        lda     #>REU_TXT
+	ldy     #$28
         jsr     PRINT_MESSAGE
 
 	lda     #$00
@@ -1218,7 +1211,7 @@ L14C0a  ldy     #$21
         sta     Z_VECTOR4
 L1968:  jsr     DEC_PAGE_COUNT
         bcc     L197E
-	jsr	DO_TWIRLY
+;	jsr	DO_TWIRLY
         lda     #>SECTOR_BUFFER
         sta     PAGE_VECTOR+1
 	ldx	#5

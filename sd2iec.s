@@ -1,5 +1,11 @@
 ; $Id$
 
+UIEC_DRIVE_TXT
+	.asc	"Drive ",0
+UIEC_DRIVE_ISNT_TXT
+	.asc	" not a"
+UIEC_DRIVE_IS_TXT
+	.asc	" SD2IEC/uIEC",0
 UIEC_SAVEROOT_TXT1
         .asc	"md", $2f, $2f, "infosave",0
 UIEC_SAVEROOT_TXT2
@@ -106,14 +112,14 @@ CNVBIT:
 
 UIEC_SWITCH_TO_MD
 .(
-	lda	#"M"
+	lda	#"m"
 	sta	UIEC_SAVEROOT_TXT3
 	rts
 .)
 
 UIEC_SWITCH_TO_CD
 .(
-	lda	#"C"
+	lda	#"c"
 	sta	UIEC_SAVEROOT_TXT3
 	rts
 .)
@@ -141,6 +147,34 @@ S2	inc     FA
 
 UIEC_IDENTIFY
 .(
+        ldy     #0
+        ldx     #23
+        clc
+        jsr     PLOT
+	ldy	#0
+L0	lda	UIEC_DRIVE_TXT,y
+	cmp	#0
+	beq	L1
+	jsr	CHROUT
+	iny
+	bne	L0
+
+L1	lda     FA
+        clc
+        adc     #$30
+        cmp     #$3a
+        bcs     CRD1c           ; have to print two bytes :(
+        jsr     CHROUT
+        jmp     CRD1d
+CRD1c
+        sec
+        sbc     #$0a
+        tay
+        lda     #"1"
+        jsr     CHROUT
+        tya
+        jsr     CHROUT
+CRD1d
 	jsr	COMMAND_OPEN
 	jsr	UIEC_SEND_RESET
 	bcs	S0
@@ -150,11 +184,25 @@ UIEC_IDENTIFY
 
 S0
 	jsr	COMMAND_CLOSE
-	clc
+	ldy	#0
+S0a	lda	UIEC_DRIVE_ISNT_TXT,y
+	cmp	#0
+	beq	S0b
+	jsr	CHROUT
+	iny
+	bne	S0a
+S0b	clc
 	rts
 S1
 	jsr	COMMAND_CLOSE
-	sec
+	ldy	#0
+S1a	lda	UIEC_DRIVE_IS_TXT,y
+	cmp	#0
+	beq	S1b
+	jsr	CHROUT
+	iny
+	bne	S1a
+S1b	sec
 	rts
 .)
 

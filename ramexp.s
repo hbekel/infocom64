@@ -12,7 +12,6 @@ GEOBUF_BANK =		$DFFF	; each bank is 16k, *not* 64k!
 				;  512k = $00-$1f
 				; 1024k = $00-$3f
 				; 2048k = $00-$7f 
-
 GEORAM_SIZE
 	.byte 0
 
@@ -35,7 +34,7 @@ L0	lda	GEOBUF_RAM,x
 	inx
 	bne 	L0
 	txa
-L1	sta	GEOBUF_RAM,x	; write 190 bytes to GeoRAM
+L1	sta	GEOBUF_RAM,x	; write 256 bytes to GeoRAM
 	lda	GEOBUF_RAM,x	; read,
 	cmp	GEOBUF_RAM,x	; and compare ...
 	bne	L2		; no good, we can't write
@@ -52,22 +51,24 @@ L2a	lda	SCRATCH_RAM,x
 	rts
 .)
 
-DET_TXT	.byte "Detected a ",0
-REUk_TXT .byte "k REU",0
-GEO_TXT .byte "k Geo/NeoRAM",0
-C128_TXT		.byte " 128"
-C128A_TXT	.byte " 256"
-C128B_TXT	.byte " 512"
-C128C_TXT	.byte "1024"
-C128D_TXT	.byte "2048"
-C128E_TXT	.byte "4096"
-C128F_TXT	.byte "8192"
-C128G_TXT	.byte "16384"
+DET_TXT	.asc "Detected ",0
+EASYFLASH_TXT .asc "EasyFlash", 0
+REUk_TXT .asc "k CBM REU",0
+GEO_TXT .asc "k Geo/NeoRAM",0
+C128_TXT		.asc " 128", 0
+C128A_TXT	.asc " 256", 0
+C128B_TXT	.asc " 512", 0
+C128C_TXT	.asc "1024", 0
+C128D_TXT	.asc "2048", 0
+C128E_TXT	.asc "4096", 0
+C128F_TXT	.asc "8192", 0
+C128G_TXT	.asc "16384", 0
+C128_TMP	.byte 0
 
 REU_DETECT:	; 2c75
 .(
 	ldy	#$ff
-L0	jsr     REU_SETUP_BANK          ; do we have bank 0?
+L0	jsr     REU_SETUP_BANK          ; Fill top banks with $BB
 	jsr	REU_CHECK_BANK
 	bcc	L1
 	dec	REU_BITS
@@ -83,32 +84,27 @@ L1	sty	REU_BANKS
 	lda	REU_PRESENT
         ora     #$01
 	sta	REU_PRESENT
-	ldy	#5
-	ldx	#5
-	clc
-	jsr	PLOT
 	ldy	#0
 L1a	lda	DET_TXT,y
-	cmp	#0
-	beq L1a1
+	beq	L1a1
 	jsr	CHROUT
 	iny
 	bne 	L1a
+
 L1a1	lda	REU_BITS
 	asl				; x2
 	asl				; x4
+	clc
+	adc	REU_BITS
 	tay
-	ldx	#0
 L1b	lda	C128_TXT,y
+	beq	L1b0
 	jsr	CHROUT
-	inx
 	iny
-	cpx	#4
 	bne	L1b
-	ldy	#0
+L1b0	ldy	#0
 L1b1	lda	REUk_TXT,y
-	cmp #0
-	beq L1b1a
+	beq	L1b1a
 	jsr	CHROUT
 	iny
 	bne 	L1b1
@@ -170,6 +166,7 @@ REU_CHECK_BANK:
         sta     REU_CBASE
         lda     #%11111101		; REU -> CBM
         sta     REU_COMMAND
+
 	lda	SECTOR_BUFFER
 	cmp	#$bb
 	beq	L2
@@ -232,6 +229,25 @@ L1	lda     GEORAM_RAM,y
         iny
         bne     L1
         rts
+.)
+
+EASYFLASH_NOTIFY
+.(
+	ldy	#0
+L1	lda	DET_TXT,y
+	cmp	#0
+	beq	L101
+	jsr	CHROUT
+	iny
+	bne	L1
+L101	ldy	#0
+L1a	lda	EASYFLASH_TXT,y
+	cmp	#0
+	beq	L1a1
+	jsr	CHROUT
+	iny
+	bne 	L1a
+L1a1	rts
 .)
 
 EASYFLASH_FETCH

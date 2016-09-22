@@ -272,29 +272,29 @@ CLOSE_ALL_FILES:
 	jmp	COMMAND_CLOSE
 .)
 
-TWIRLY: .byte   188, 172, 187, 190
-TWIRLY_STATE:   .byte 0
+;TWIRLY: .byte   188, 172, 187, 190
+;TWIRLY_STATE:   .byte 0
                                 ; | = 98
                                 ; / = 110
                                 ; - = 99
                                 ; \ = 109
 
-DO_TWIRLY
-.(
-        ldy     #19
-        ldx     #$10
-        clc
-        jsr     PLOT            ; move cursor to last asterisk spot
-        ldy     TWIRLY_STATE
-        lda     TWIRLY,y
-        jsr     CHROUT
-        iny
-        cpy     #4
-        bne     L1
-        ldy     #0
-L1	sty     TWIRLY_STATE
-        rts
-.)
+;DO_TWIRLY
+;.(
+;        ldy     #19
+;        ldx     #$10
+;        clc
+;        jsr     PLOT            ; move cursor to last asterisk spot
+;        ldy     TWIRLY_STATE
+;        lda     TWIRLY,y
+;        jsr     CHROUT
+;        iny
+;        cpy     #4
+;        bne     L1
+;        ldy     #0
+;L1	sty     TWIRLY_STATE
+;        rts
+;.)
 
 PREP_SYSTEM
 .(
@@ -356,20 +356,26 @@ L3      sta     $0340,x
         sta     SPMC
         sta     SP0COL			; this is 1 in v5!!!!!
         ;
-        ; hack in UIEC -- this might not work -- latest CK
+        ; detect expansions
         ;
+        ldy     #0
+        ldx     #22
+        clc
+        jsr     PLOT
         lda     REU_PRESENT     ; skip for EasyFlash -- already done this
-        bne     L5
-        jsr     UIEC_IDENTIFY
-        bcc     L4
-
- 	lda	#8
-	sta	REU_PRESENT
+        beq	L4
+	jsr	EASYFLASH_NOTIFY
+	jmp	L5
 L4      clc
         jsr     REU_DETECT
         bcs     L5
         jsr     GEORAM_DETECT
-L5      clc
+L5	jsr	UIEC_IDENTIFY
+	bcc	L6
+	lda	REU_PRESENT
+	ora	#8
+	sta	REU_PRESENT
+L6	clc
 	rts
 .)
 
@@ -452,9 +458,7 @@ BLANK_TEXT
 END_SESSION_TEXT: .aasc "End of session.", $0d, $0d
                 .aasc "Press [RETURN] to restart.", $0d ; extra gunk >v3
 
-REU_TXT:	.aasc "(Loading story data into REU)", $0d
-CBM_REU_TXT:	.aasc "(Loading story data into C= REU)", $0d
-GEO_RAM_TXT:	.aasc "(Loading story data into GeoRAM)", $0d
+REU_TXT:	.aasc "(Loading story data into expansion RAM)", $0d
 
 PATIENT: .aasc "(Loading resident code into system RAM)", $0d
 STORY_LOADING_TEXT
