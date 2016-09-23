@@ -132,6 +132,9 @@ STARTUP
         ldx     #<STORY_LOADING_TEXT
         lda     #>STORY_LOADING_TEXT
         ldy     #$19
+;        ldx     #<PATIENT
+;        lda     #>PATIENT
+;        ldy     #$28
         jsr     PRINT_MESSAGE
 
         lda     REU_PRESENT
@@ -2430,12 +2433,12 @@ L1EF2:  lda     $26
         bne     L1EF2
 L1F07:  rts
 
-PUNCT_LIST:  .aasc	"!?,.", $0d, " "
+PUNCTUATION:  .asc	"!?,.", $0d, " "
 
 L1F0E:  jsr     L1F1F
         bcs     L1F48
 L1F13:  ldx     #$05
-L1F15:  cmp     PUNCT_LIST,x
+L1F15:  cmp     PUNCTUATION,x
         beq     L1F48
         dex
         bpl     L1F15

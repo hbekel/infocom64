@@ -112,6 +112,9 @@ STARTUP
         ldx     #<STORY_LOADING_TEXT
         lda     #>STORY_LOADING_TEXT
         ldy     #$19
+;        ldx     #<PATIENT
+;        lda     #>PATIENT
+;        ldy     #$28
         jsr     PRINT_MESSAGE
 
         lda     REU_PRESENT
@@ -597,8 +600,8 @@ L1185:  cmp     #$01
         bne     L118C
         jmp     Z_RTRUE
 
-L118C:  jsr     L11C6
-        jsr     L11C6
+L118C:  jsr     DEC_VECTOR1
+        jsr     DEC_VECTOR1
         lda     #$00
         sta     Z_VECTOR2+1
         lda     Z_VECTOR1+1
@@ -628,18 +631,22 @@ L11AA:  sta     Z_PC
         sta     $1C
 Z_NOP:  rts
 
-L11C6:  lda     Z_VECTOR1
+DEC_VECTOR1
+.(	lda     Z_VECTOR1
         sec
         sbc     #$01
         sta     Z_VECTOR1
-        bcs     L11D1
+        bcs     L1
         dec     Z_VECTOR1+1
-L11D1:  rts
+L1:	rts
+.)
 
-INC_VECTOR3:  inc     Z_VECTOR1
-        bne     L11D8
+INC_VECTOR1
+.(	inc     Z_VECTOR1
+        bne     L1
         inc     Z_VECTOR1+1
-L11D8:  rts
+L1:	rts
+.)
 
 L11D9:  lda     Z_OPERAND1
         sta     Z_VECTOR1
@@ -878,7 +885,7 @@ L135A:  ldy     #$00
 
 Z_INC:  lda     Z_OPERAND1
         jsr     L109D
-        jsr     INC_VECTOR3
+        jsr     INC_VECTOR1
         jmp     L1378
 
 ; 1OP:134 6 dec (variable)
@@ -886,7 +893,7 @@ Z_INC:  lda     Z_OPERAND1
 
 Z_DEC:  lda     Z_OPERAND1
         jsr     L109D
-        jsr     L11C6
+        jsr     DEC_VECTOR1
 L1378:  lda     Z_OPERAND1
         jmp     SET_GLOBAL_OR_LOCAL_WORD
 
@@ -1709,7 +1716,7 @@ Z_RANDOM:
         sta     Z_VECTOR1
         lda     $59
         sta     Z_VECTOR1+1
-        jsr     INC_VECTOR3
+        jsr     INC_VECTOR1
         jmp     L110A
 
 ; VAR:232 8 push value
@@ -1866,7 +1873,7 @@ L1982:  rts
 L1983:  jsr     L199A
         bcs     L19AA
 L1988:  ldx     #$05
-L198A:  cmp     L1994,x
+L198A:  cmp     PUNCTUATION,x
         beq     L19AA
         dex
         bpl     L198A
@@ -1898,13 +1905,13 @@ L19AC:  ldy     #$00
         sta     Z_VECTOR1+1
         lda     (Z_VECTOR1),y
         sta     $4B
-        jsr     INC_VECTOR3
+        jsr     INC_VECTOR1
         lda     (Z_VECTOR1),y
         sta     $4A
-        jsr     INC_VECTOR3
+        jsr     INC_VECTOR1
         lda     (Z_VECTOR1),y
         sta     $49
-        jsr     INC_VECTOR3
+        jsr     INC_VECTOR1
 L19D2:  ldy     #$00
         lda     (Z_VECTOR1),y
         cmp     $3D
@@ -3600,8 +3607,8 @@ POS_CONFIRM_TEXT:
 	.aasc $0d, $0d, "Position *."
 	.aasc $0d, "Are you sure? (Y/N) >" ; 22
 
-L1994
-	.byte	$21, $3f, $2c, $2e, $0d, $20
+PUNCTUATION
+	.asc	"!?,.", $0d, " "
 
 VERSION_TEXT
 	.aasc	"C64 Version I (CUR_DATE-01)", $0d

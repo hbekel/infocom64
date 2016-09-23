@@ -233,27 +233,6 @@ L1223:  lda     Z_HDR_DYN_SIZE		; bz a 54
 L122F:  adc     #$06			; bz a 5a
         sta     Z_STATIC_ADDR
 
-#ifdef	BAKA				; this sets up max number of saves
-        ldx     #$00
-        stx     Z_MAX_SAVES
-L1239:  inc     Z_MAX_SAVES
-        clc
-        adc     Z_STATIC_ADDR		; bz a B4 x 1
-        bcc     L1239
-L1242:  inc     Z_MAX_SAVES
-        clc
-        adc     Z_STATIC_ADDR		; bz cs
-        bcc     L1242
-L124B:  cmp     #$97
-        bcs     L1258
-        inc     Z_MAX_SAVES
-        clc
-        adc     Z_STATIC_ADDR
-        bcc     L124B
-L1258:  lda     Z_MAX_SAVES
-        cmp     #$09
-        bcc     L1261
-#endif
         lda     #$09
 	sta	Z_MAX_SAVES		; me
 L1261:  clc
@@ -301,11 +280,10 @@ L12BE:  lda     #$00
         sta     $70
         lda     INTERP_FLAGS
         cmp     #$01
-        bne     L12E2
+        bne     MAIN_LOOP
         sta     $6B
         ora     Z_HDR_FLAGS2+1
         sta	Z_HDR_FLAGS2+1
-L12E2:  ;jsr     CLEAR_SCREEN
 
 MAIN_LOOP
 	lda     #$00
@@ -1303,7 +1281,7 @@ L1A79:  lda     $32
         sbc     #$06
         beq     L1A87
         tax
-        lda     VALID_PUNCTUATION_V5,x
+        lda     VALID_PUNCTUATION,x
         jmp     L1A6B
 
 L1A87:  jsr     L1B2B
@@ -1523,7 +1501,7 @@ L1BD1:  lda     $32
         jmp     L1BC3
 
 L1C00:  ldx     #$19
-L1C02:  cmp     VALID_PUNCTUATION_V5,x
+L1C02:  cmp     VALID_PUNCTUATION,x
         beq     L1C0B
         dex
         bne     L1C02
@@ -1588,11 +1566,6 @@ L1C29:  lda     L32E0
         ora     #$80
         sta     L32E3
         rts
-
-VALID_PUNCTUATION_V5:  .byte	00, $0d
-	.byte	"0123456789.,!?_#'
-	.byte	$22
-	.byte	"/\-:()"
 
 L1C8F:  stx     Z_VECTOR2+1
         asl
@@ -3366,12 +3339,13 @@ L296A:  lda     $29
         bne     L296A
 L297F:  rts
 
-L2980:  .byte	$21, $3f, $2c, $2e, $0d, $20, $00
+PUNCTUATION
+	.asc	"!?,.", $0d, " ", $00
 
 L2987:  jsr     L2998
         bcs     L29C1
 L298C:  ldx     #$06
-L298E:  cmp     L2980,x
+L298E:  cmp     PUNCTUATION,x
         beq     L29C1
         dex
         bpl     L298E

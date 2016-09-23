@@ -95,7 +95,7 @@ BINBCD16:
 CNVBIT:
 	asl	$FFFE		; Shift out one bit
 	rol	$FFFF
-	lda	UIEC_BCD+2		; And add into result
+	lda	UIEC_BCD+2	; And add into result
 	adc	UIEC_BCD+2
 	sta	UIEC_BCD+2
 	lda	UIEC_BCD+1	; propagating any carry
@@ -287,7 +287,7 @@ UIEC_ONLY
 .(
 	lda	REU_PRESENT
 	and	#$0f
-	cmp	#$08
+	cmp	#8
 	beq	L1
 	clc
 	rts

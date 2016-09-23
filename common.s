@@ -317,7 +317,7 @@ PREP_SYSTEM
         lda     #EASYFLASH_KILL
         sta     EASYFLASH_CONTROL       ; EasyFlash now off -- turn on and
                                         ; set R6510 to $37 to get ROMs
-	jmp	L1
+	bne	L1			; save a byte
 L0	
 	jsr	PREFERENCES_READ
 
@@ -340,11 +340,10 @@ L2      sta     SIDBASE,x
         sta     PWHI1
         lda     #$80
         sta     SIGVOL
+        sta     VCREG3
         lda     #$EE
         sta     FRELO3
         sta     FREHI3
-        lda     #$80
-        sta     VCREG3
         ldx     #$3F
         lda     #$00
 L3      sta     $0340,x
@@ -462,7 +461,7 @@ REU_TXT:	.aasc "(Loading story data into expansion RAM)", $0d
 
 PATIENT: .aasc "(Loading resident code into system RAM)", $0d
 STORY_LOADING_TEXT
-        .aasc  "The story is loading ...", $0d
+	.aasc "The story is loading ...", $0d
 YES_TEXT
         .aasc "YES", $0d
 NO_TEXT
