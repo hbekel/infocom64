@@ -461,3 +461,8 @@ EAPI_SET_SLOT =         $DF98
 
 GAMESLOT_BASE =         $BC00           ; EasyFlash banks and descriptions
 GAMESLOT_STRIDE =       $20
+
+; BIT skips
+#define	SKIP1	.byte $24
+#define SKIP2	.byte $2C
+

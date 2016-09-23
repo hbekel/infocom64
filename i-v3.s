@@ -632,7 +632,8 @@ L11AA:  sta     Z_PC
 Z_NOP:  rts
 
 DEC_VECTOR1
-.(	lda     Z_VECTOR1
+.(
+	lda     Z_VECTOR1
         sec
         sbc     #$01
         sta     Z_VECTOR1
@@ -642,7 +643,8 @@ L1:	rts
 .)
 
 INC_VECTOR1
-.(	inc     Z_VECTOR1
+.(
+	inc     Z_VECTOR1
         bne     L1
         inc     Z_VECTOR1+1
 L1:	rts
