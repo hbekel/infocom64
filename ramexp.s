@@ -29,11 +29,11 @@ GEORAM_DETECT
 	tax
 	sta	GEOBUF_BANK
 	sta	GEOBUF_PAGE	; GeoRAM $0000
-L0	lda	GEOBUF_RAM,x
-	sta	SCRATCH_RAM
-	inx
-	bne 	L0
-	txa
+;L0	lda	GEOBUF_RAM,x
+;	sta	SCRATCH_RAM
+;	inx
+;	bne 	L0
+;	txa
 L1	sta	GEOBUF_RAM,x	; write 256 bytes to GeoRAM
 	lda	GEOBUF_RAM,x	; read,
 	cmp	GEOBUF_RAM,x	; and compare ...
@@ -43,27 +43,27 @@ L1	sta	GEOBUF_RAM,x	; write 256 bytes to GeoRAM
 	lda	REU_PRESENT
 	ora	#$02		; All good, GeoRAM is there
 	sta	REU_PRESENT
-L2	ldx	#0
-L2a	lda	SCRATCH_RAM,x
-	sta	GEOBUF_RAM,x
-	inx
-	bne	L2a
-	rts
+;L2	ldx	#0
+;L2a	lda	SCRATCH_RAM,x
+;	sta	GEOBUF_RAM,x
+;	inx
+;	bne	L2a
+L2	rts
 .)
 
-DET_TXT	.asc "Detected ",0
+DET_TXT	.asc "Found ",0
 EASYFLASH_TXT .asc "EasyFlash", 0
 REUk_TXT .asc "k CBM REU",0
-GEO_TXT .asc "k Geo/NeoRAM",0
-C128_TXT		.asc " 128", 0
-C128A_TXT	.asc " 256", 0
-C128B_TXT	.asc " 512", 0
-C128C_TXT	.asc "1024", 0
-C128D_TXT	.asc "2048", 0
-C128E_TXT	.asc "4096", 0
-C128F_TXT	.asc "8192", 0
-C128G_TXT	.asc "16384", 0
-C128_TMP	.byte 0
+GEO_TXT .asc "k GeoRAM",0
+C128_TXT	.asc " 128", 0, 0
+		.asc " 256", 0, 0
+		.asc " 512", 0, 0
+		.asc "1024", 0
+		.asc "2048", 0
+		.asc "4096", 0
+		.asc "8192", 0
+		.asc "16384", 0
+		.byte 0
 
 REU_DETECT:	; 2c75
 .(

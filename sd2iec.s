@@ -6,12 +6,6 @@ UIEC_DRIVE_ISNT_TXT
 	.asc	" not a"
 UIEC_DRIVE_IS_TXT
 	.asc	" SD2IEC/uIEC",0
-UIEC_SAVEROOT_TXT1
-        .asc	"md", $2f, $2f, "infosave",0
-UIEC_SAVEROOT_TXT2
-        .asc	"cd", $2f, $2f, "infosave",0
-UIEC_SAVEROOT_TXT3
-        .asc	"md", $2f, $2f, "infosave", $2f, ":000.000000"
 #define	UIEC_REL_OFFSET	14
 UIEC_RESET_TXT
         .asc	"ui"
@@ -40,74 +34,32 @@ UIEC_SEEK
 	jmp	UIEC_COMMAND
 .)
 	
-
-IEC_BIN_TO_HEX
-.(
-	jsr	UIEC_BIN_TO_DEC
-
-	ldy	#0
-	ldx	#0
-U1	lda	UIEC_BCD,y
-	pha
-	and	#$f0
-	asl
-	asl
-	asl
-	asl
-	clc
-	adc	#$30
-	sta	UIEC_SAVEROOT_TXT3+UIEC_REL_OFFSET,x
-	inx
-	pla
-	and	#$0f
-	clc
-	adc	#$30
-	sta     UIEC_SAVEROOT_TXT3+UIEC_REL_OFFSET+1,x
-	inx
-	inx
-	iny
-	cpy	#3
-	bne	U1
-	rts
-.)
+#ifdef NOTYET
+UIEC_SAVEROOT_TXT1
+        .asc	"md", $2f, $2f, "infosave",0
+UIEC_SAVEROOT_TXT2
+        .asc	"cd", $2f, $2f, "infosave",0
+UIEC_SAVEROOT_TXT3
+        .asc	"md", $2f, $2f, "infosave", $2f, ":000.000000"
 
 ; stolen from http://forum.6502.org/viewtopic.php?p=7637
 
-UIEC_BCD
-	.byte 00, 00, 00
-
 UIEC_BIN_TO_DEC			; xy=$POINTER
 .(
-	stx	CNVBIT+1
-	inx
-	stx	CNVBIT+4
-	sty	CNVBIT+2
-	sty	CNVBIT+5
+	tax
+	dex
+	bmi	L2
+        lda	#0
+        clc
+        php
+	sed
 
-BINBCD16:
-	sed			; Switch to decimal mode
-	lda	#0		; Ensure the result is clear
-	sta	UIEC_BCD
-	sta	UIEC_BCD+1
-	sta	UIEC_BCD+2
-	ldx	#16		; The number of source bits
-       
-CNVBIT:
-	asl	$FFFE		; Shift out one bit
-	rol	$FFFF
-	lda	UIEC_BCD+2	; And add into result
-	adc	UIEC_BCD+2
-	sta	UIEC_BCD+2
-	lda	UIEC_BCD+1	; propagating any carry
-	adc	UIEC_BCD+1
-	sta	UIEC_BCD+1
-	lda	UIEC_BCD+0	; ... thru whole result
-	adc	UIEC_BCD+0
-	sta	UIEC_BCD+0
-	dex			; And repeat for next bit
-	bne	CNVBIT
-	cld			; Back to binary
-	rts
+L1	adc	#1
+	dex
+	bpl	L1
+
+	plp
+L2	rts
 .)
 
 UIEC_SWITCH_TO_MD
@@ -123,6 +75,7 @@ UIEC_SWITCH_TO_CD
 	sta	UIEC_SAVEROOT_TXT3
 	rts
 .)
+#endif
 
 UIEC_SCAN
 .(
