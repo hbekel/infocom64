@@ -2981,7 +2981,7 @@ L22B0:  jsr     GETIN
         sta     $0340
 L22C8:  txa
         beq     L22B0
-        cmp     #"A"	; are we between "a" and "z"
+        cmp     #"a"	; are we between "a" and "z"
         bcc     L22D5
         cmp     #"["
         bcs     L22D5
