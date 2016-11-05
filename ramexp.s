@@ -55,9 +55,9 @@ DET_TXT	.asc "Found ",0
 EASYFLASH_TXT .asc "EasyFlash", 0
 REUk_TXT .asc "k CBM REU",0
 GEO_TXT .asc "k GeoRAM",0
-C128_TXT	.asc " 128", 0, 0
-		.asc " 256", 0, 0
-		.asc " 512", 0, 0
+C128_TXT	.asc " 128", 0
+		.asc " 256", 0
+		.asc " 512", 0
 		.asc "1024", 0
 		.asc "2048", 0
 		.asc "4096", 0
@@ -91,11 +91,12 @@ L1a	lda	DET_TXT,y
 	iny
 	bne 	L1a
 
-L1a1	lda	REU_BITS
-	asl				; x2
-	asl				; x4
-	clc
-	adc	REU_BITS
+L1a1	ldy	REU_BITS
+	lda	#0
+L1a1a	clc
+	adc	#5
+	dey
+	bne	L1a1a
 	tay
 L1b	lda	C128_TXT,y
 	beq	L1b0
