@@ -94,7 +94,6 @@ MAX_RAM_PAGE =		$CF
 SAVE_SLOTS =		9
 REU_TXT_LEN =	$52
 
-.word	$0e00
 * = $0e00
 
 	jsr	PREP_SYSTEM
@@ -152,7 +151,9 @@ L4	sta     Z_STORY_PAGE_INDEX,x
         sta     Z_BASE_PAGE
         sta     PAGE_VECTOR+1
 
-	lda	REU_PRESENT
+	jmp     SKIP_LOAD
+	
+	lda	REU_PRESENT	
 	and	#%00000100
 	beq	L5
 				; set EasyFlash bank to 1, prepping for load
@@ -174,6 +175,8 @@ L7
 	bcc	L8
 	jmp	FATAL_ERROR_0E
 
+SKIP_LOAD:	
+	
 L8	lda	Z_HDR_CODE_VERSION
 	cmp	#4		; handle v1-3
 	bcc	L9
@@ -232,6 +235,8 @@ L11	sta     $29
 
 ; continue loading resident portion into RAM, regardless of REU presence.
 
+	jmp PREP_FOR_RUN
+	
 L12	lda     STORY_INDEX
         cmp     Z_RESIDENT_ADDR
         bcs     L13
