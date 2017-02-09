@@ -5,3 +5,7 @@ i-v4
 i-v5
 infocom*
 *.label
+*.prg
+*.res
+*.reu
+*.bin

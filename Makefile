@@ -4,6 +4,7 @@ XA =		xa
 XAFLAGS =	-M -O PETSCII
 DATE =		$(shell date '+%Y/%m/%d')
 INC_STUFF =	common.s ramexp.s sd2iec.s
+HIGHMEM =       79
 
 all:		infocom3 infocom4 infocom5 config ef_menu
 
@@ -35,3 +36,20 @@ bin2efcrt:	bin2efcrt.o
 
 clean:
 		rm -f i-v[345] infocom[345] config ef_menu bin2efcrt i-v[345].label
+		rm -f zork.{prg,reu,res} *.bin
+
+zork.prg: i-v3 zork.res
+	cat i-v3 zork.res > $@
+
+zork.res: zork.dat
+	dd if=$< of=$@ bs=256 count=$(HIGHMEM)
+
+zork.reu: zork.dat
+	dd if=/dev/zero of=$@ bs=1024 count=512
+	dd if=$< of=$@ bs=256 skip=$(HIGHMEM) conv=notrunc
+
+i-v3.bin: i-v3
+	dd if=$< of=$@ bs=1 skip=1537
+
+test: zork.prg zork.reu
+	x64sc -reu -reusize 512 -reuimage zork.reu zork.prg

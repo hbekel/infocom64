@@ -299,10 +299,23 @@ CLOSE_ALL_FILES:
 PREP_SYSTEM
 .(
 	sta	EF_START_BANK
-        lda     #$01
+
+        /* HB: Add cosmetic sync to screen... */
+
+sync    lda $d012               ; sync to top of screen
+        bne sync
+        lda $d011
+        bpl sync
+
+        lda     #$0C            ; set bg color
+        sta     EXTCOL
+        
+        lda #$0b                ; turn off screen
+        sta $d011
+        
+        lda     #$01            ; setup colors
         sta     COLOR
         lda     #$0C
-        sta     EXTCOL
         sta     BGCOL0
         lda     #147            ; clear screen
         jsr     CHROUT
@@ -311,6 +324,9 @@ PREP_SYSTEM
         lda     #$80
         sta     MODE
 
+        lda #$1b                ; turn on screen
+        sta $d011        
+        
         lda     REU_PRESENT
         beq	L0              ; EasyFlash will have set this to #$04
 
@@ -319,8 +335,11 @@ PREP_SYSTEM
                                         ; set R6510 to $37 to get ROMs
 	bne	L1			; save a byte
 L0	
-	jsr	PREFERENCES_READ
+        /* HB: Skip loading prefs from disk
+               
+        jsr	PREFERENCES_READ
 
+        */
 L1
         lda     R6510
         and     #%11111110
@@ -354,9 +373,18 @@ L3      sta     $0340,x
         sta     SPBGPR
         sta     SPMC
         sta     SP0COL			; this is 1 in v5!!!!!
-        ;
+
         ; detect expansions
-        ;
+        
+        /* HB: We always use the Ultimate CBM REU, so we just pretend */
+
+        lda     #$01
+        sta     REU_PRESENT
+        clc
+        rts
+        
+        /* HB: Skip actual detection, this would override the preloaded content
+        
         ldy     #0
         ldx     #22
         clc
@@ -373,9 +401,11 @@ L5	jsr	UIEC_IDENTIFY
 	bcc	L6
 	lda	REU_PRESENT
 	ora	#8
-	sta	REU_PRESENT
+	sta	REU_PRESENT        
 L6	clc
 	rts
+        
+        */        
 .)
 
 PREFERENCES_READ:

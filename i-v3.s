@@ -91,11 +91,17 @@ MAX_RAM_PAGE =		$CF
 
 ; compile-time constants that are modified for version I
 
-SAVE_SLOTS =		9
-REU_TXT_LEN =	$52
+SAVE_SLOTS  = 9
+REU_TXT_LEN = $52
+
+* = $0801
+        
+.byte $01, $08, $0b, $08, $01, $00, $9e, $33, $35, $38, $34, $00
+        
+.dsb $0e00 - $0801 - 10
 
 * = $0e00
-
+        
 	jsr	PREP_SYSTEM
 
 STARTUP
@@ -104,6 +110,8 @@ STARTUP
         ldx     #$FF
         txs
         jsr     CLALL
+
+/* HB: Skip loading message
         ldy     #$08
         ldx     #$0B
         clc
@@ -115,7 +123,7 @@ STARTUP
 ;        lda     #>PATIENT
 ;        ldy     #$28
         jsr     PRINT_MESSAGE
-
+*/      
         lda     REU_PRESENT
 	and	#%00001111	; we have to have at least a uIEC ...
 	bne	L1
@@ -144,16 +152,18 @@ L4	sta     Z_STORY_PAGE_INDEX,x
         inc     Z_STACK_POINTER
         inc     $18
         inc     $2D
-
+        
 ; load in first page of story file
 
+        /* HB: We still need this... */
+        
         lda     #>Z_HEADER
         sta     Z_BASE_PAGE
         sta     PAGE_VECTOR+1
 
-	jmp     SKIP_LOAD
-	
-	lda	REU_PRESENT	
+        /* HB: ... but we skip actually loading first page        
+        
+	lda	REU_PRESENT
 	and	#%00000100
 	beq	L5
 				; set EasyFlash bank to 1, prepping for load
@@ -175,8 +185,8 @@ L7
 	bcc	L8
 	jmp	FATAL_ERROR_0E
 
-SKIP_LOAD:	
-	
+        */
+        
 L8	lda	Z_HDR_CODE_VERSION
 	cmp	#4		; handle v1-3
 	bcc	L9
@@ -233,10 +243,10 @@ L11	sta     $29
         lda     Z_HDR_OBJECTS+1
         sta     Z_OBJECTS_ADDR
 
+/* HB: Skip loading resident RAM contents and REU contents
+        
 ; continue loading resident portion into RAM, regardless of REU presence.
 
-	jmp PREP_FOR_RUN
-	
 L12	lda     STORY_INDEX
         cmp     Z_RESIDENT_ADDR
         bcs     L13
@@ -270,8 +280,9 @@ L13a
 	beq	PREP_FOR_RUN		; uIEC-only, so we jump right in
         jsr     REU_LOAD_STORY
 	jsr	CLOSE_STORY_FILE
+*/
 .)
-
+        
 ;
 ; At this point we've got enough in memory to start execution.  Prep for run.
 ;
