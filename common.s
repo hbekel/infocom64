@@ -335,11 +335,13 @@ sync    lda $d012               ; sync to top of screen
                                         ; set R6510 to $37 to get ROMs
 	bne	L1			; save a byte
 L0	
-        /* HB: Skip loading prefs from disk
-               
-        jsr	PREFERENCES_READ
 
-        */
+/* HB: Skip loading of preferences in ultimate variant */
+	
+#if PRELOADED=0
+        jsr	PREFERENCES_READ
+#endif
+
 L1
         lda     R6510
         and     #%11111110
@@ -376,15 +378,17 @@ L3      sta     $0340,x
 
         ; detect expansions
         
-        /* HB: We always use the Ultimate CBM REU, so we just pretend */
+#if PRELOADED=1
+        /* HB: We always use the Ultimate CBM REU, so we just pretend
+	 * it's there. Also skip actual detection, since this
+	 * would override the preloaded content.
+	*/
 
-        lda     #$01
+	lda     #$01
         sta     REU_PRESENT
         clc
         rts
-        
-        /* HB: Skip actual detection, this would override the preloaded content
-        
+#else                     
         ldy     #0
         ldx     #22
         clc
@@ -404,8 +408,8 @@ L5	jsr	UIEC_IDENTIFY
 	sta	REU_PRESENT        
 L6	clc
 	rts
-        
-        */        
+#endif         
+
 .)
 
 PREFERENCES_READ:

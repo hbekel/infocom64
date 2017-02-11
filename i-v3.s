@@ -111,7 +111,7 @@ STARTUP
         txs
         jsr     CLALL
 
-/* HB: Skip loading message
+#if PRELOADED=0
         ldy     #$08
         ldx     #$0B
         clc
@@ -123,7 +123,8 @@ STARTUP
 ;        lda     #>PATIENT
 ;        ldy     #$28
         jsr     PRINT_MESSAGE
-*/      
+#endif
+	
         lda     REU_PRESENT
 	and	#%00001111	; we have to have at least a uIEC ...
 	bne	L1
@@ -161,8 +162,10 @@ L4	sta     Z_STORY_PAGE_INDEX,x
         sta     Z_BASE_PAGE
         sta     PAGE_VECTOR+1
 
-        /* HB: ... but we skip actually loading first page        
-        
+        /* HB: ... but we skip actually loading first page */
+
+#if PRELOADED=0
+	
 	lda	REU_PRESENT
 	and	#%00000100
 	beq	L5
@@ -185,7 +188,7 @@ L7
 	bcc	L8
 	jmp	FATAL_ERROR_0E
 
-        */
+#endif
         
 L8	lda	Z_HDR_CODE_VERSION
 	cmp	#4		; handle v1-3
@@ -243,8 +246,10 @@ L11	sta     $29
         lda     Z_HDR_OBJECTS+1
         sta     Z_OBJECTS_ADDR
 
-/* HB: Skip loading resident RAM contents and REU contents
-        
+/* HB: Skip loading resident RAM contents and REU contents */
+
+#if PRELOADED=0
+
 ; continue loading resident portion into RAM, regardless of REU presence.
 
 L12	lda     STORY_INDEX
@@ -280,7 +285,9 @@ L13a
 	beq	PREP_FOR_RUN		; uIEC-only, so we jump right in
         jsr     REU_LOAD_STORY
 	jsr	CLOSE_STORY_FILE
-*/
+
+#endif
+	
 .)
         
 ;
