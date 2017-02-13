@@ -42,6 +42,7 @@ bin2efcrt:	bin2efcrt.o
 clean:
 		rm -f i-v[345] infocom[345] config ef_menu bin2efcrt i-v[345].label
 		rm -f zork.{prg,reu,res,d64}
+		rm -f trinity.{prg,reu,res,d64}
 		rm -f *.bin
 
 zork.prg: i-v3 zork.res
@@ -66,3 +67,20 @@ zork.d64:
 	c1541 -format zork,84 d64 $@ 8 \
 		-write infocom3 \
 		-write zork.dat story.dat
+
+trinity.prg: i-v4 trinity.res
+	cat i-v4 trinity.res > $@
+
+trinity.res: trinity.dat
+	dd if=$< of=$@ bs=256 count=175
+
+trinity.reu: trinity.dat
+	dd if=/dev/zero of=$@ bs=1024 count=512
+	dd if=$< of=$@ bs=256 skip=175 conv=notrunc
+
+i-v4.bin: i-v4
+	dd if=$< of=$@ bs=1 skip=1537
+
+trinity: 
+	make PRELOADED=1 clean trinity.prg trinity.reu 
+	x64sc -reu -reusize 512 -reuimage trinity.reu trinity.prg

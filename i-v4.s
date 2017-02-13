@@ -125,6 +125,9 @@ STARTUP
         ldx     #$FF
         txs
         jsr     CLALL
+
+#if PRELOADED=0
+        
         ldy     #$08
         ldx     #$0B
         clc
@@ -137,6 +140,8 @@ STARTUP
 ;        ldy     #$28
         jsr     PRINT_MESSAGE
 
+#endif
+        
         lda     REU_PRESENT
         and     #%00001111      ; we have to have at least a uIEC ...
         bne     L2
@@ -163,6 +168,8 @@ L3	sta     $00,x
 	adc	#$C0
 	sta	MAX_RES_PAGE_CALC
 
+#if PRELOADED=0
+        
         lda     REU_PRESENT
         and     #%00000100
         beq     L1Ed1a
@@ -185,6 +192,8 @@ LEd1b
         bcc     L4
         jmp     FATAL_ERROR_0E
 
+#endif
+        
 L4	lda     Z_HDR_CODE_VERSION	; v4?
         cmp     #4
         beq     L6
@@ -339,6 +348,8 @@ L12	clc
         adc     #$30
         sta     SAVE_SLOT
 
+#if PRELOADED=0
+        
         ldy     #$01
         ldx     #$0E
         clc
@@ -355,6 +366,9 @@ L12	clc
 	jsr	UIEC_ONLY
 	bcs	L13a
 	jsr	CLOSE_STORY_FILE
+        
+#endif
+        
 L13a
 	clc
         lda     Z_HDR_START_PC
