@@ -112,10 +112,13 @@ Z_HDR_SCREEN_COLS =     Z_HEADER + $21
 
 SECTOR_BUFFER = $0800
 
-.text
-.word	$1000
+* = $0801
+        
+.byte $01, $08, $0b, $08, $01, $00, $9e, $34, $30, $39, $36, $00
+        
+.dsb $1000 - $0801 - 10
 
-	* = $1000
+* = $1000
 
 	jsr	PREP_SYSTEM
 
