@@ -277,6 +277,7 @@ L129A:  ldx     #<PATIENT
 
 #else
         jsr PREPARE_BUFFERS
+        jsr CLEAR_SCREEN
 #endif
         
 L129Aa
