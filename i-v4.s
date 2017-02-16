@@ -370,7 +370,9 @@ L12	clc
 	bcs	L13a
 	jsr	CLOSE_STORY_FILE
         
-#endif
+#else
+        jsr PREPARE_BUFFERS
+#endif        
         
 L13a
 	clc
@@ -2863,7 +2865,7 @@ L1
         lda     STORY_INDEX+1
         sbc     #$00
         tax
-
+        
 	jsr	IREU_FETCH
 L2
 	jsr	SECBUF_TO_PVEC
@@ -2922,6 +2924,7 @@ L3	tya
 .)
 
 LOAD_RESIDENT
+PREPARE_BUFFERS      
 .(
 	ldx     #$04
         stx     L210E
@@ -2950,6 +2953,10 @@ L3	sta     $0D00,x
         cpx     #$05
         bcc     L3
 
+#if PRELOADED=1
+        rts
+#endif
+        
 L4	lda     STORY_INDEX
         cmp     Z_HIGH_ADDR	
         bcs     LOAD_NONRESIDENT
@@ -5117,7 +5124,7 @@ MAX_RES_PAGE_CALC .byte 0
 #include "common.s"
 #include "sd2iec.s"
 #include "ramexp.s"
-
+        
 ; pad up to next page
 .dsb    $100 - (* & $00FF), $FF
 

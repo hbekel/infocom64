@@ -72,14 +72,14 @@ trinity.prg: i-v4 trinity.res
 	cat i-v4 trinity.res > $@
 
 trinity.res: trinity.dat
-	dd if=$< of=$@ bs=256 count=175
+	dd if=$< of=$@ bs=256 count=175 
 
 trinity.reu: trinity.dat
 	dd if=/dev/zero of=$@ bs=1024 count=512
 	dd if=$< of=$@ bs=256 skip=175 conv=notrunc
 
 i-v4.bin: i-v4
-	dd if=$< of=$@ bs=1 skip=1537
+	dd if=$< of=$@ bs=1 skip=2049
 
 trinity: 
 	make PRELOADED=1 clean trinity.prg trinity.reu 
