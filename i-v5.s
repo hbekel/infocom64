@@ -32,7 +32,6 @@ Z_STACK_LO              = $0900
 Z_STACK_HI              = $0b00
 Z_LOCAL_VARIABLES       = $0f00
 
-;Z_HEADER =              $4300
 Z_HDR_CODE_VERSION =    Z_HEADER + 0
 Z_HDR_MODE_BITS =       Z_HEADER + 1
 Z_HDR_RESIDENT_SIZE =   Z_HEADER + 4
@@ -65,7 +64,12 @@ Z_HDR_EXTENSION_ADDR =	Z_HEADER + $36
 SECTOR_BUFFER = $0800
 SCREEN_WIDTH            = 40
 
-.word	$1000
+* = $0801
+        
+.byte $01, $08, $0b, $08, $01, $00, $9e, $34, $30, $39, $36, $00
+        
+.dsb $1000 - $0801 - 10
+
 * = $1000
 
 	jsr	PREP_SYSTEM
@@ -75,6 +79,9 @@ STARTUP:
         ldx     #$FF
         txs
         jsr     CLALL
+
+#if PRELOADED=0
+        
 ;        jsr     CLEAR_SCREEN
         ldy     #$08
         ldx     #$0B
@@ -85,6 +92,8 @@ STARTUP:
         ldy     #$19
         jsr     PRINT_MESSAGE
 
+#endif
+        
         lda     REU_PRESENT
         and     #%00001111      ; we have to have at least a uIEC ...
         bne     L1142
@@ -102,13 +111,15 @@ L1146:  sta     $00,x
         inc     $6A
         inc     $63
         inc     Z_BASE_PAGE+1
-        lda     #>Z_HEADER		; game data from $4300
+        lda     #>Z_HEADER		; game data from $4000
         sta     Z_BASE_PAGE
         sta     PAGE_VECTOR+1
 	clc
 	adc	#$AF			; sick and wrong hardcoding
 	sta	MAX_RES_PAGE_CALC
 
+#if PRELOADED=0
+        
         lda     REU_PRESENT
         and     #%00000100
         beq     L1Ed1a
@@ -130,6 +141,8 @@ LEd1b
         bcc     L1167
         jmp     FATAL_ERROR_0E
 
+#endif
+        
 L1167:  lda     Z_HDR_CODE_VERSION	; v5?
         cmp     #$05
         beq     L1173
@@ -137,6 +150,9 @@ L1167:  lda     Z_HDR_CODE_VERSION	; v5?
         jmp     FATAL_ERROR
 
 ; C64 Z5 games absolutely require the resident size to be set to $2BC0.
+
+; However, the actual resident size is $AEFF, so that the first $AF pages
+; go into RAM starting at $4000 and the rest goes into non-resident memory 
 
 L1173
 	lda	#$2b
@@ -240,6 +256,9 @@ L1261:  clc
         sta     SAVE_SLOT
         ldy     #$01
         ldx     #$0E
+
+#if PRELOADED=0
+        
         clc
         jsr     PLOT
         jmp     L129A
@@ -255,6 +274,11 @@ L129A:  ldx     #<PATIENT
 	jsr	UIEC_ONLY
 	bcs	L129Aa
 	jsr	CLOSE_STORY_FILE
+
+#else
+        jsr PREPARE_BUFFERS
+#endif
+        
 L129Aa
 	clc
         lda     $26
@@ -1090,7 +1114,9 @@ L18B8:  tya
         clc
         rts
 
-LOAD_RESIDENT:  ldx     #$0D
+LOAD_RESIDENT:
+PREPARE_BUFFERS:        
+        ldx     #$0D
         stx     L176F
         lda     #$FF
 L18C8:  sta     $0E00,x
@@ -1116,6 +1142,11 @@ L18E8:  sta     $0D00,x
         tya
         cpx     #$0E
         bcc     L18E8
+
+#if PRELOADED=1
+        rts
+#endif
+        
         lda     Z_HDR_FILE_LENGTH+1
         sta     Z_VECTOR3
         lda     Z_HDR_FILE_LENGTH

@@ -9,7 +9,7 @@ XAFLAGS  +=      -DPRELOADED=$(PRELOADED)
 
 INCLUDES =	common.s ramexp.s sd2iec.s
 
-.PHONY: all clean zork zork.d64
+.PHONY: all clean zork zork.d64 trinity borderzone
 
 all:		infocom3 infocom4 infocom5 config ef_menu
 
@@ -41,8 +41,7 @@ bin2efcrt:	bin2efcrt.o
 
 clean:
 		rm -f i-v[345] infocom[345] config ef_menu bin2efcrt i-v[345].label
-		rm -f zork.{prg,reu,res,d64}
-		rm -f trinity.{prg,reu,res,d64}
+		rm -f {zork,trinity,borderzone}.{prg,reu,res,d64}
 		rm -f *.bin
 
 zork.prg: i-v3 zork.res
@@ -84,3 +83,20 @@ i-v4.bin: i-v4
 trinity: 
 	make PRELOADED=1 clean trinity.prg trinity.reu 
 	x64sc -reu -reusize 512 -reuimage trinity.reu trinity.prg
+
+borderzone.prg: i-v5 borderzone.res
+	cat i-v5 borderzone.res > $@
+
+borderzone.res: borderzone.dat
+	dd if=$< of=$@ bs=256 count=175
+
+borderzone.reu: borderzone.dat
+	dd if=/dev/zero of=$@ bs=1024 count=512
+	dd if=$< of=$@ bs=256 skip=175 conv=notrunc
+
+i-v5.bin: i-v5
+	dd if=$< of=$@ bs=1 skip=2049
+
+borderzone: 
+	make PRELOADED=1 clean borderzone.prg borderzone.reu 
+	x64sc -reu -reusize 512 -reuimage borderzone.reu borderzone.prg
