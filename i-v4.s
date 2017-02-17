@@ -3712,6 +3712,7 @@ L292C:  ldx     $4F
         inx
         cpx     Z_CURRENT_WINDOW_HEIGHT
         bcc     L2971
+COL_MR0 = *+1                  
         lda     #$00
         sta     $4F
         sta     COLOR
@@ -3731,6 +3732,7 @@ L294D:  jsr	GETIN
         ldx     $78
         clc
         jsr     PLOT
+COL_FG1 = *+1
         lda     #$01
         sta     COLOR
         ldx     #<BLANK_TEXT

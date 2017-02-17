@@ -3820,6 +3820,7 @@ L2D35:  ldx     $52
         lda     #$00
         sta     $52
         sta     $C6
+COL_MR0 = *+1        
 	lda	#$00 ;PREF_MORE_COLOR		; v4 has #$00
         sta     COLOR
         jsr     L349E
@@ -3836,6 +3837,7 @@ L2D59:  jsr     GETIN
         ldx     L32FE
         clc
         jsr     PLOT
+COL_FG1 = *+1
 	lda	#$01	; PREF_FG_COLOR		; v4 has #$01
         sta     COLOR
         ldx     #<BLANK_TEXT

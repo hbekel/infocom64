@@ -2751,6 +2751,8 @@ Z_NEW_LINE:  inc     $65
         cmp     $66
         bcc     L20ED
         jsr     Z_SHOW_STATUS
+
+COL_MR0 = *+1
         lda     #$00
         sta     $65
         sta     COLOR
@@ -2770,6 +2772,7 @@ L20C9:  jsr     GETIN
         ldx     $64
         clc
         jsr     PLOT
+COL_FG1 = *+1
         lda     #$01
         sta     COLOR
         ldx     #<BLANK_TEXT
@@ -2837,6 +2840,7 @@ L2151:  lda     INPUT_BUFFER,x
         sta     INPUT_BUFFER,x
         dex
         bpl     L2151
+COL_ST0 = *+1        
         lda     #$00
         sta     $60
         sta     COLOR
@@ -2949,7 +2953,8 @@ L223F:  lda     Z_LOCAL_VARIABLES + $20,x
         jsr     PLOT	; restore original position
         ldx     #$00
         stx     $22
-        inx
+COL_FG3 = *+1
+        ldx     #$01
         stx     COLOR
         rts
 .)

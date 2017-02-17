@@ -307,14 +307,20 @@ sync    lda $d012               ; sync to top of screen
         lda $d011
         bpl sync
 
+COL_BG0 = *+1
+        
         lda     #$0C            ; set bg color
         sta     EXTCOL
         
         lda #$0b                ; turn off screen
         sta $d011
+
+COL_FG0 = *+1
         
         lda     #$01            ; setup colors
         sta     COLOR
+
+COL_BG1 = *+1        
         lda     #$0C
         sta     BGCOL0
         lda     #147            ; clear screen
