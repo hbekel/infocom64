@@ -11,3 +11,4 @@ infocom*
 *.bin
 *.d64
 colors.h
+code.h

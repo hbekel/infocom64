@@ -2751,12 +2751,13 @@ Z_NEW_LINE:  inc     $65
         cmp     $66
         bcc     L20ED
         jsr     Z_SHOW_STATUS
-
-COL_MR0 = *+1
         lda     #$00
         sta     $65
-        sta     COLOR
         sta     $C6
+COL_MR0 = *+1
+	lda     #$00
+        sta     COLOR
+
         sec
         jsr     PLOT
         sty     $63
@@ -2840,9 +2841,10 @@ L2151:  lda     INPUT_BUFFER,x
         sta     INPUT_BUFFER,x
         dex
         bpl     L2151
-COL_ST0 = *+1        
         lda     #$00
         sta     $60
+COL_ST0 = *+1        	
+	lda     #$00
         sta     COLOR
         lda     #$13		; set cursor to home (0,0)
         jsr     CHROUT
@@ -3292,6 +3294,7 @@ CLEAR_SCREEN
         ldx     #$04
 L2559:  lda     #$20		; PETSCII space
         sta     (Z_VECTOR2),y	; fill $0400-07ff
+COL_FG2 = *+1
         lda     #$01		; White character
         sta     (Z_VECTOR3),y	; fill $d800-dbff
         iny
@@ -3432,6 +3435,7 @@ PRINT_MESSAGE_INV_STATUS_LINE
 L1	lda     VICSCN,x
         ora     #$80
         sta     VICSCN,x
+COL_ST1 = *+1
         lda     #$00
         sta     COLRAM,x
         dex

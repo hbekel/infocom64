@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+3.upto(5) do |version|
+  filename = "i-v#{version}.bin"
+  size = File.size(filename)
+  print "uint8_t FileTypeZMachine :: i#{version}[#{size}] = {\n    "
+
+  File.open(filename, 'rb') do |f|
+    i = 0    
+    f.each_byte do |b|
+      print "0x%02X," % [b]
+      i+=1
+      print "\n    " if i % 16 == 0
+    end
+  end
+  puts "};\n"
+end

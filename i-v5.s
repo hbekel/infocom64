@@ -4893,9 +4893,10 @@ Z_SET_WINDOW
         bne     L35C0
         lda     #$00		; window 0 (main body)
         sta     Z_CURRENT_WINDOW
-                                ; CK mod - switch to color white
+				; CK mod - switch to color white
+COLASC_FG0 = *+1	
         lda     #05
-        jsr     CHROUT
+	jsr     CHROUT
                                 ; end CK mod
 L35B2:  jsr     L3558
         lda     L3301
@@ -4906,7 +4907,8 @@ L35B2:  jsr     L3558
 L35C0:  cmp     #$01
         bne     L3583		; we handle only windows 0 and 1 :)
         sta     Z_CURRENT_WINDOW		; window 1 (status line)
-                                ; CK mod - switch to color black
+				; CK mod - switch to color black
+COLASC_ST0 = *+1
         lda     #$90
         jsr     CHROUT
                                 ; end CK mod
@@ -5020,6 +5022,7 @@ L3689:  sty     SPENA
         ldx     #$04
 L368E:  lda     #$20
         sta     (Z_VECTOR2),y
+COL_FG2 = *+1
         lda     #$01
         sta     ($0A),y
         iny

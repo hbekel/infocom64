@@ -43,11 +43,15 @@ clean:
 		rm -f i-v[345] infocom[345] config ef_menu bin2efcrt i-v[345].label
 		rm -f {zork,trinity,borderzone}.{prg,reu,res,d64}
 		rm -f *.bin
-		rm -f colors.h
+		rm -f {colors,code}.h
 
 colors.h: i-v3.s i-v4.s i-v5.s
 	make PRELOADED=1 clean i-v3 i-v4 i-v5
 	./colors > $@
+
+code.h: i-v3.bin i-v4.bin i-v5.bin
+	make PRELOADED=1 clean i-v3.bin i-v4.bin i-v5.bin
+	./code > $@
 
 zork.prg: i-v3 zork.res
 	cat i-v3 zork.res > $@

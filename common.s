@@ -376,10 +376,12 @@ L2      sta     SIDBASE,x
 L3      sta     $0340,x
         dex
         bpl     L3
-        sta     SP6COL
         sta     YXPAND
+        sta     XXPAND	
         sta     SPBGPR
         sta     SPMC
+COL_CR0 = *+1
+	lda     #$00
         sta     SP0COL			; this is 1 in v5!!!!!
 
         ; detect expansions
