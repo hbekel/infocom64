@@ -41,7 +41,9 @@ bin2efcrt:	bin2efcrt.o
 
 clean:
 		rm -f i-v[345] infocom[345] config ef_menu bin2efcrt i-v[345].label
-		rm -f {zork,trinity,borderzone}.{prg,reu,res,d64}
+		rm -f zork.{prg,reu,res,d64}
+		rm -f trinity.{prg,reu,res,d64}
+		rm -f borderzone.{prg,reu,res,d64}
 		rm -f *.bin
 		rm -f {colors,code}.h
 

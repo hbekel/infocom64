@@ -93,7 +93,7 @@ MAX_RAM_PAGE =		$CF
 
 SAVE_SLOTS  = 9
 REU_TXT_LEN = $52
-
+        
 * = $0801
         
 .byte $01, $08, $0b, $08, $01, $00, $9e, $33, $35, $38, $34, $00
@@ -2773,7 +2773,8 @@ L20C9:  jsr     GETIN
         ldx     $64
         clc
         jsr     PLOT
-COL_FG1 = *+1
+
+COL_FG2 = *+1
         lda     #$01
         sta     COLOR
         ldx     #<BLANK_TEXT
@@ -3294,7 +3295,7 @@ CLEAR_SCREEN
         ldx     #$04
 L2559:  lda     #$20		; PETSCII space
         sta     (Z_VECTOR2),y	; fill $0400-07ff
-COL_FG2 = *+1
+COL_FG4 = *+1
         lda     #$01		; White character
         sta     (Z_VECTOR3),y	; fill $d800-dbff
         iny

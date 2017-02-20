@@ -3733,7 +3733,7 @@ L294D:  jsr	GETIN
         ldx     $78
         clc
         jsr     PLOT
-COL_FG1 = *+1
+COL_FG2 = *+1
         lda     #$01
         sta     COLOR
         ldx     #<BLANK_TEXT
@@ -3978,7 +3978,8 @@ Z_SET_TEXT_STYLE
         bne     L2
         lda     #$92		; reverse off
         jsr     CHROUT
-COLASC_FG1 = *+1
+
+COLPET_FG0 = *+1
 	lda	#$05		; CK
 	jsr	CHROUT		; CK
         lda     #$82 	; underline off (on C128/80c)
@@ -4097,7 +4098,7 @@ L2B14:  lda     #>VICSCN
 L2B33:  stx     Z_VECTOR4
 L2B35:  lda     #$20
         sta     (Z_VECTOR2),y
-COL_FG2 = *+1
+COL_FG3 = *+1
         lda     #$01
         sta     (Z_VECTOR3),y
         dex
@@ -4639,7 +4640,7 @@ Z_SET_WINDOW:
         lda     #$00
         sta     Z_CURRENT_WINDOW
 				; CK mod - switch to color white
-COLASC_FG0 = *+1	
+COLPET_FG0 = *+1	
 	lda	#$05		; CK
 	jsr	CHROUT		; CK
 	lda	#$92		; CK
@@ -4654,7 +4655,7 @@ L2FD3:  cmp     #1		; this is window 1
         bne     L2F9E		; we handle only windows 0 and 1 :)
         sta     Z_CURRENT_WINDOW		; window 1 (status line)
 				; CK mod - switch to color black
-COLASC_ST0 = *+1
+COLPET_ST0 = *+1
 	lda	#$90
 	jsr	CHROUT
 	lda	#$12
@@ -4741,9 +4742,10 @@ CLEAR_SCREEN
         ldx     #$04
 L306B:  lda     #$20
         sta     (Z_VECTOR2),y		; all spaces in screen and ...
-COL_FG3 = *+1
+        
+COL_FG4 = *+1
         lda     #$01
-        sta     (Z_VECTOR3),y		; all character color is white.
+        sta     (Z_VECTOR3),y		; all character color is white (default).
         iny
         bne     L306B
         inc     Z_VECTOR2+1

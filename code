@@ -3,7 +3,7 @@
 3.upto(5) do |version|
   filename = "i-v#{version}.bin"
   size = File.size(filename)
-  print "uint8_t FileTypeZMachine :: i#{version}[#{size}] = {\n    "
+  print "uint8_t FileTypeZMachine :: i%d[0x%04X] = {\n    " % [version, size]
 
   File.open(filename, 'rb') do |f|
     i = 0    

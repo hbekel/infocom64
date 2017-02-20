@@ -302,21 +302,19 @@ PREP_SYSTEM
 
         /* HB: Add cosmetic sync to screen... */
 
-sync    lda $d012               ; sync to top of screen
-        bne sync
-        lda $d011
-        bpl sync
+SYNC    lda RASTER               ; sync to top of screen
+        bne SYNC
+        lda VICTRL1
+        bpl SYNC
 
-COL_BG0 = *+1
-        
+COL_BG0 = *+1        
         lda     #$0C            ; set bg color
         sta     EXTCOL
         
-        lda #$0b                ; turn off screen
-        sta $d011
+        lda #$0B                ; turn off screen
+        sta VICTRL1
 
-COL_FG0 = *+1
-        
+COL_FG0 = *+1        
         lda     #$01            ; setup colors
         sta     COLOR
 
@@ -330,8 +328,13 @@ COL_BG1 = *+1
         lda     #$80
         sta     MODE
 
-        lda #$1b                ; turn on screen
-        sta $d011        
+-SYNC   lda RASTER               ; sync to top of screen
+        bne SYNC
+        lda VICTRL1
+        bpl SYNC
+        
+        lda #$1B                ; turn on screen
+        sta VICTRL1
         
         lda     REU_PRESENT
         beq	L0              ; EasyFlash will have set this to #$04
@@ -380,7 +383,8 @@ L3      sta     $0340,x
         sta     XXPAND	
         sta     SPBGPR
         sta     SPMC
-COL_CR0 = *+1
+        
+COL_FG1 = *+1
 	lda     #$00
         sta     SP0COL			; this is 1 in v5!!!!!
 

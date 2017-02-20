@@ -3,21 +3,21 @@
 3.upto(5) do |version|
   filename = "i-v%s.label" % [version]
 
-  puts "void FileTypeZMachine :: color%s(uint8_t *prg, uint8_t fg, uint8_t bg, uint8_t st, uint8_t mr, uint8_t cr)" % [version]
+  puts "void FileTypeZMachine :: color%s(uint8_t *prg, uint8_t fg, uint8_t bg, uint8_t st, uint8_t mr)" % [version]
   puts '{'
 
   File.open(filename, 'r') do |f|
     f.each_line do |line|
-      ["fg", "bg", "st", "mr", "cr"].each do |col|
+      ["fg", "bg", "st", "mr"].each do |col|
 
         if line =~ /^COL_#{col}\d, 0x([0-9A-F]{4})/i
           addr = $1.to_i(16) - 0x0801 + 2;
           puts "    prg[0x%04X] = %s;" % [addr, col]; 
         end
 
-        if line =~ /^COLASC_#{col}\d, 0x([0-9A-F]{4})/i
+        if line =~ /^COLPET_#{col}\d, 0x([0-9A-F]{4})/i
           addr = $1.to_i(16) - 0x0801 + 2;
-          puts "    prg[0x%04X] = col2asc[%s];" % [addr, col]; 
+          puts "    prg[0x%04X] = color2petscii[%s];" % [addr, col]; 
         end
       end
     end
