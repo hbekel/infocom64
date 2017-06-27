@@ -3989,7 +3989,7 @@ L2	cpx     #$01	; reverse?
         bne     L3
 	lda	Z_CURRENT_WINDOW
 	beq	L2a
-	lda     #$90	; reverse PETSCII
+	lda     #$12	; reverse PETSCII
 	jsr	CHROUT
 L2a	lda	#$12
         jmp     L4
