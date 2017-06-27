@@ -3989,8 +3989,9 @@ L2	cpx     #$01	; reverse?
         bne     L3
 	lda	Z_CURRENT_WINDOW
 	beq	L2a
-	lda     #$12	; reverse PETSCII
-	jsr	CHROUT
+COLPET_ST0 = *+1        
+	lda     #$90	; spec says this should be reversed, 
+	jsr	CHROUT  ; but on the C64 the status color is used
 L2a	lda	#$12
         jmp     L4
 L3	cpx     #$04	; italic?
@@ -4655,7 +4656,7 @@ L2FD3:  cmp     #1		; this is window 1
         bne     L2F9E		; we handle only windows 0 and 1 :)
         sta     Z_CURRENT_WINDOW		; window 1 (status line)
 				; CK mod - switch to color black
-COLPET_ST0 = *+1
+COLPET_ST1 = *+1
 	lda	#$90
 	jsr	CHROUT
 	lda	#$12
