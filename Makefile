@@ -95,6 +95,23 @@ trinity:
 	make PRELOADED=1 clean trinity.prg trinity.reu 
 	x64sc -reu -reusize 512 -reuimage trinity.reu trinity.prg
 
+bureaucracy.prg: i-v4 bureaucracy.res
+	cat i-v4 bureaucracy.res > $@
+
+bureaucracy.res: bureaucracy.dat
+	dd if=$< of=$@ bs=256 count=175 
+
+bureaucracy.reu: bureaucracy.dat
+	dd if=/dev/zero of=$@ bs=1024 count=512
+	dd if=$< of=$@ bs=256 skip=175 conv=notrunc
+
+i-v4.bin: i-v4
+	dd if=$< of=$@ bs=1 skip=2049
+
+bureaucracy: 
+	make PRELOADED=1 clean bureaucracy.prg bureaucracy.reu 
+	x64sc -reu -reusize 512 -reuimage bureaucracy.reu bureaucracy.prg
+
 borderzone.prg: i-v5 borderzone.res
 	cat i-v5 borderzone.res > $@
 
