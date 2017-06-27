@@ -44,6 +44,7 @@ clean:
 		rm -f zork.{prg,reu,res,d64}
 		rm -f trinity.{prg,reu,res,d64}
 		rm -f borderzone.{prg,reu,res,d64}
+		rm -f bureaucracy.{prg,reu,res,d64}
 		rm -f *.bin
 		rm -f {colors,code}.h
 
